@@ -8,17 +8,61 @@
 import SwiftUI
 
 struct ContentView: View {
+    // Accept the view model from the app and promote it to a StateObject for stability.
+    @StateObject private var viewModel: WorkoutViewModel
+    @EnvironmentObject private var navigator: MyNavigator
+
+    // Custom initializer to wrap the injected instance.
+    init(viewModel: WorkoutViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationStack(path: $navigator.navPath) {
+            VStack(spacing: 24) {
+                Text("Workout Tracker")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .padding(.top)
+
+                Picker("Workout", selection: $viewModel.selectedWorkout) {
+                    ForEach(viewModel.workouts) { workout in
+                        Text(workout.name).tag(workout)
+                    }
+                }
+                .pickerStyle(.menu)
+
+                Button("Start") {
+                    viewModel.startWorkout()
+                    // Example navigation to the selected workout detail.
+                    navigator.navigate(to: .workout(viewModel.selectedWorkout))
+                }
+                .buttonStyle(.borderedProminent)
+                .padding(.top, 10)
+
+                Button {
+                    navigator.navigate(to: .stats)
+                } label: {
+                    Text("Stats")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .padding(.top, 8)
+            }
+            .padding()
+            .navigationDestination(for: Route.self) { route in
+                switch route {
+                case .stats:
+                    StatsView(viewModel: viewModel)
+                case .workout(let workout):
+                    TrackWorkoutView(viewModel: viewModel, workout: workout)
+                }
+            }
         }
-        .padding()
     }
 }
 
 #Preview {
-    ContentView()
+    ContentView(viewModel: WorkoutViewModel())
+        .environmentObject(MyNavigator())
 }

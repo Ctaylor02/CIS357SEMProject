@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct CIS357ProjectApp: App {
+    @StateObject private var viewModel = WorkoutViewModel()
+    @StateObject private var navigator = MyNavigator()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(viewModel: viewModel)
+                .environmentObject(navigator)
         }
     }
 }
