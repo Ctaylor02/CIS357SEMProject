@@ -56,6 +56,8 @@ struct ContentView: View {
                     HistoryView(viewModel: viewModel)
                 case .workout(let workout):
                     TrackWorkoutView(viewModel: viewModel, workout: workout)
+                case .summary(let workout):
+                    WorkoutSummaryView(viewModel: viewModel, workout: workout)
                 }
             }
         }

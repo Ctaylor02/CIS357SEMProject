@@ -10,6 +10,7 @@ import Combine
 enum Route: Hashable {
     case History
     case workout(Workout)
+    case summary(Workout)
 }
 
 class MyNavigator: ObservableObject {
