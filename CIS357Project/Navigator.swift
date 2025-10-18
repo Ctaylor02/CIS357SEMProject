@@ -8,7 +8,7 @@ import SwiftUI
 import Combine
 
 enum Route: Hashable {
-    case stats
+    case History
     case workout(Workout)
 }
 

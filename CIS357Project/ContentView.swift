@@ -41,9 +41,9 @@ struct ContentView: View {
                 .padding(.top, 10)
 
                 Button {
-                    navigator.navigate(to: .stats)
+                    navigator.navigate(to: .History)
                 } label: {
-                    Text("Stats")
+                    Text("History")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
@@ -52,8 +52,8 @@ struct ContentView: View {
             .padding()
             .navigationDestination(for: Route.self) { route in
                 switch route {
-                case .stats:
-                    StatsView(viewModel: viewModel)
+                case .History:
+                    HistoryView(viewModel: viewModel)
                 case .workout(let workout):
                     TrackWorkoutView(viewModel: viewModel, workout: workout)
                 }

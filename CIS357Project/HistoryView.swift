@@ -1,5 +1,5 @@
 //
-//  StatsView.swift
+//  HistoryView.swift
 //  CIS357Project
 //
 //  Created by Sam Uptigrove on 10/18/25.
@@ -7,22 +7,22 @@
 
 import SwiftUI
 
-struct StatsView: View {
+struct HistoryView: View {
     @ObservedObject var viewModel: WorkoutViewModel
 
     var body: some View {
         VStack {
-            Text("Workout Stats")
+            Text("Workout History")
                 .font(.largeTitle)
                 .padding(.bottom)
-            Text("Your stats will appear here for \(viewModel.selectedWorkout.name).")
+            Text("Your workout history for \(viewModel.selectedWorkout.name) will appear here.")
                 .foregroundStyle(.secondary)
         }
-        .navigationTitle("Stats")
+        .navigationTitle("Workout History")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 #Preview {
-    StatsView(viewModel: WorkoutViewModel())
+    HistoryView(viewModel: WorkoutViewModel())
 }
