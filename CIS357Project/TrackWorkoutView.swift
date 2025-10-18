@@ -2,8 +2,7 @@
 //  TrackWorkoutView.swift
 //  CIS357Project
 //
-//  Created by Aiden Mack on 10/18/25.
-//  Updated by Caleb Taylor on 10/18/25.
+//  Created by Caleb Taylor on 10/18/25.
 //
 
 import SwiftUI
@@ -20,32 +19,42 @@ struct TrackWorkoutView: View {
                 .fontWeight(.semibold)
                 .padding(.top)
 
-            // Live timer display
             Text(formatTime(viewModel.elapsedTime))
                 .font(.system(size: 48, weight: .bold, design: .monospaced))
                 .padding()
 
-            Button(action: {
-                let completedWorkout = viewModel.completeWorkout()
-                navigator.navigate(to: .summary(completedWorkout))
-            }) {
-                Text("Finish Workout")
-                    .font(.title2)
-                    .frame(maxWidth: .infinity)
+            HStack(spacing: 20) {
+                Button(action: {
+                    if viewModel.isPaused {
+                        viewModel.resumeTimer()
+                    } else {
+                        viewModel.pauseTimer()
+                    }
+                }) {
+                    Text(viewModel.isPaused ? "Resume" : "Pause")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+
+                Button(action: {
+                    // Pass a copy of the current workout with the elapsed time
+                    var workoutCopy = workout
+                    workoutCopy.duration = viewModel.elapsedTime
+                    // Do NOT append to history here
+                    navigator.navigate(to: .summary(workoutCopy))
+                }) {
+                    Text("Finish")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
             }
-            .buttonStyle(.borderedProminent)
             .padding(.horizontal)
         }
-        .onAppear {
-            viewModel.startTimer()
-        }
-        .onDisappear {
-            viewModel.stopTimer()
-        }
+        .onAppear { viewModel.startTimer() }
+        .onDisappear { viewModel.stopTimer() }
         .padding()
     }
 
-    // Helper for formatting time
     func formatTime(_ time: TimeInterval) -> String {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
