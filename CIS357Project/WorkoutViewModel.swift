@@ -2,32 +2,24 @@
 //  WorkoutViewModel.swift
 //  CIS357Project
 //
-//  Created by Sam Uptigrove on 10/18/25.
-//  Updated by Caleb Taylor on 10/18/25.
+//  Created by Caleb Taylor on 10/18/25.
 //
 
 import Foundation
 import Combine
+import SwiftUI
 
-// MARK: - Workout Model
-struct Workout: Identifiable, Hashable {
-    let id = UUID()
-    let name: String
-    var date: Date? = nil
-    var duration: TimeInterval = 0
-    var isCompleted: Bool = false
-}
-
-// MARK: - Workout ViewModel
 class WorkoutViewModel: ObservableObject {
     @Published var workouts: [Workout]
     @Published var selectedWorkout: Workout
     @Published var history: [Workout] = []
 
-    // Timer properties
+    // Timer
     @Published var elapsedTime: TimeInterval = 0
+    @Published var isPaused: Bool = false
     private var timer: AnyCancellable? = nil
     private var startDate: Date? = nil
+    private var pausedTime: TimeInterval = 0
 
     init() {
         let defaultWorkouts = [
@@ -40,17 +32,31 @@ class WorkoutViewModel: ObservableObject {
         self.selectedWorkout = defaultWorkouts.first!
     }
 
-    // MARK: - Timer Controls
+    // Timer controls
     func startTimer() {
         startDate = Date()
         elapsedTime = 0
+        pausedTime = 0
+        isPaused = false
         timer?.cancel()
         timer = Timer.publish(every: 1, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
-                guard let self = self, let start = self.startDate else { return }
-                self.elapsedTime = Date().timeIntervalSince(start)
+                guard let self = self, !self.isPaused, let start = self.startDate else { return }
+                self.elapsedTime = self.pausedTime + Date().timeIntervalSince(start)
             }
+    }
+
+    func pauseTimer() {
+        guard !isPaused else { return }
+        pausedTime = elapsedTime
+        isPaused = true
+    }
+
+    func resumeTimer() {
+        guard isPaused else { return }
+        startDate = Date()
+        isPaused = false
     }
 
     func stopTimer() {
@@ -61,22 +67,29 @@ class WorkoutViewModel: ObservableObject {
     func resetTimer() {
         stopTimer()
         elapsedTime = 0
+        pausedTime = 0
+        isPaused = false
     }
 
-    // MARK: - Workout Management
+    // Workout management
     func startWorkout() {
-        print("Started \(selectedWorkout.name)")
         startTimer()
+        print("Started \(selectedWorkout.name)")
     }
 
-    func completeWorkout() -> Workout {
+    func completeWorkout(note: String? = nil) -> Workout {
         stopTimer()
         var completed = selectedWorkout
         completed.isCompleted = true
         completed.date = Date()
         completed.duration = elapsedTime
+        completed.note = note
         history.append(completed)
         return completed
+    }
+
+    func deleteWorkout(at offsets: IndexSet) {
+        history.remove(atOffsets: offsets)
     }
 
     func clearHistory() {

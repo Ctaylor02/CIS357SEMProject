@@ -11,6 +11,7 @@ struct WorkoutSummaryView: View {
     @ObservedObject var viewModel: WorkoutViewModel
     @EnvironmentObject var navigator: MyNavigator
     let workout: Workout
+    @State private var noteText: String = ""
 
     var body: some View {
         VStack(spacing: 24) {
@@ -22,14 +23,23 @@ struct WorkoutSummaryView: View {
                 Text("Workout: \(workout.name)")
                 Text("Date: \(formatDate(workout.date))")
                 Text("Duration: \(formatTime(workout.duration))")
+
+                Text("Notes:")
+                    .font(.headline)
+                TextEditor(text: $noteText)
+                    .frame(height: 100)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.gray.opacity(0.4))
+                    )
             }
-            .font(.title3)
-            .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
             .background(.gray.opacity(0.1))
             .cornerRadius(12)
 
             Button("Save & Return") {
+                // Append to history here, only once, including notes
+                _ = viewModel.completeWorkout(note: noteText)
                 navigator.navigateBackToRoot()
             }
             .buttonStyle(.borderedProminent)
