@@ -14,6 +14,8 @@ class WorkoutViewModel: ObservableObject {
     @Published var selectedWorkout: Workout
     @Published var history: [Workout] = []
 
+
+
     // Timer
     @Published var elapsedTime: TimeInterval = 0
     @Published var isPaused: Bool = false
@@ -79,11 +81,13 @@ class WorkoutViewModel: ObservableObject {
 
     func completeWorkout(note: String? = nil) -> Workout {
         stopTimer()
-        var completed = selectedWorkout
-        completed.isCompleted = true
-        completed.date = Date()
-        completed.duration = elapsedTime
-        completed.note = note
+        let completed = Workout(
+                    name: selectedWorkout.name,
+                    date: Date(),
+                    duration: elapsedTime,
+                    isCompleted: true,
+                    note: note
+                )
         history.append(completed)
         return completed
     }
