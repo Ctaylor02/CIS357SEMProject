@@ -7,7 +7,8 @@ struct TrackWorkoutView: View {
 
     var body: some View {
         ZStack {
-            RadialGradient(colors: [Color.orange.opacity(0.2), Color.red.opacity(0.1)], center: .center, startRadius: 100, endRadius: 500)
+            RadialGradient(colors: [Color.orange.opacity(0.2), Color.red.opacity(0.1)],
+                           center: .center, startRadius: 100, endRadius: 500)
                 .ignoresSafeArea()
 
             VStack(spacing: 40) {
@@ -15,12 +16,23 @@ struct TrackWorkoutView: View {
                     .font(.system(size: 32, weight: .semibold, design: .rounded))
                     .foregroundColor(.purple)
 
-                Text(formatTime(viewModel.elapsedTime))
-                    .font(.system(size: 72, weight: .bold, design: .monospaced))
-                    .foregroundColor(.orange)
-                    .padding()
-                    .background(RoundedRectangle(cornerRadius: 20).fill(.white.opacity(0.2)))
-                    .shadow(radius: 8)
+                ZStack {
+                    Circle()
+                        .stroke(Color.gray.opacity(0.2), lineWidth: 20)
+
+                    Circle()
+                        .trim(from: 0, to: min(CGFloat(viewModel.elapsedTime / max(workout.duration, 1)), 1.0))
+                        .stroke(AngularGradient(gradient: Gradient(colors: [.purple, .orange]), center: .center),
+                                style: StrokeStyle(lineWidth: 20, lineCap: .round))
+                        .rotationEffect(.degrees(-90))
+                        .animation(.linear(duration: 1), value: viewModel.elapsedTime)
+
+                    Text(formatTime(viewModel.elapsedTime))
+                        .font(.system(size: 72, weight: .bold, design: .monospaced))
+                        .foregroundColor(.orange)
+                }
+                .frame(width: 250, height: 250)
+                .padding()
 
                 HStack(spacing: 20) {
                     Button(viewModel.isPaused ? "Resume" : "Pause") {
@@ -34,7 +46,7 @@ struct TrackWorkoutView: View {
                     Button("Finish") {
                         var workoutCopy = workout
                         workoutCopy.duration = viewModel.elapsedTime
-                        workoutCopy.date = Date()           // <-- Fix: add the date here
+                        workoutCopy.date = Date() // Set the date for summary/history
                         navigator.navigate(to: .summary(workoutCopy))
                     }
                     .buttonStyle(.borderedProminent)
@@ -58,6 +70,6 @@ struct TrackWorkoutView: View {
 }
 
 #Preview {
-    TrackWorkoutView(viewModel: WorkoutViewModel(), workout: Workout(name: "Running"))
+    TrackWorkoutView(viewModel: WorkoutViewModel(), workout: Workout(name: "Running", duration: 1800))
         .environmentObject(MyNavigator())
 }

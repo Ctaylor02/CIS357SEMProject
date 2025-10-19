@@ -5,6 +5,7 @@ struct WorkoutSummaryView: View {
     @EnvironmentObject var navigator: MyNavigator
     let workout: Workout
     @State private var noteText: String = ""
+    @State private var showAchievementBanner = false
 
     var body: some View {
         ZStack {
@@ -49,6 +50,13 @@ struct WorkoutSummaryView: View {
                     // Append to history with notes
                     _ = viewModel.completeWorkout(note: noteText)
                     navigator.navigateBackToRoot()
+                    // Show achievement banner if there is one
+                    if viewModel.recentAchievement != nil {
+                        showAchievementBanner = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                            showAchievementBanner = false
+                        }
+                    }
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.purple)
@@ -60,6 +68,22 @@ struct WorkoutSummaryView: View {
             }
             .padding(.top, 40)
             .padding(.bottom, 20)
+
+            // MARK: - Achievement Banner
+            if showAchievementBanner, let achievement = viewModel.recentAchievement {
+                VStack {
+                    Spacer()
+                    Text("🏅 \(achievement)")
+                        .font(.headline)
+                        .padding()
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(12)
+                        .shadow(radius: 5)
+                        .padding()
+                }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .animation(.easeInOut, value: showAchievementBanner)
+            }
         }
     }
 
