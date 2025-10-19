@@ -1,10 +1,3 @@
-//
-//  WorkoutSummaryView.swift
-//  CIS357Project
-//
-//  Created by Caleb Taylor on 10/18/25.
-//
-
 import SwiftUI
 
 struct WorkoutSummaryView: View {
@@ -14,41 +7,63 @@ struct WorkoutSummaryView: View {
     @State private var noteText: String = ""
 
     var body: some View {
-        VStack(spacing: 24) {
-            Text("Workout Summary")
-                .font(.largeTitle)
-                .fontWeight(.bold)
+        ZStack {
+            LinearGradient(colors: [Color.blue.opacity(0.2), Color.purple.opacity(0.1)],
+                           startPoint: .topLeading,
+                           endPoint: .bottomTrailing)
+                .ignoresSafeArea()
 
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Workout: \(workout.name)")
-                Text("Date: \(formatDate(workout.date))")
-                Text("Duration: \(formatTime(workout.duration))")
+            VStack(spacing: 30) {
+                Text("Workout Summary")
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .foregroundStyle(.purple)
 
-                Text("Notes:")
-                    .font(.headline)
-                TextEditor(text: $noteText)
-                    .frame(height: 100)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray.opacity(0.4))
-                    )
+                VStack(alignment: .leading, spacing: 15) {
+                    Text("Workout: \(workout.name)")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+
+                    Text("Date: \(formatDate(workout.date))")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+
+                    Text("Duration: \(formatTime(workout.duration))")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+
+                    Text("Notes:")
+                        .font(.headline)
+
+                    TextEditor(text: $noteText)
+                        .padding(6)
+                        .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.2)))
+                        .shadow(radius: 4)
+                        .frame(height: 120)
+                }
+                .padding()
+                .background(RoundedRectangle(cornerRadius: 20).fill(Color.white.opacity(0.15)))
+                .shadow(radius: 6)
+                .padding(.horizontal)
+
+                Button("Save & Return") {
+                    // Append to history with notes
+                    _ = viewModel.completeWorkout(note: noteText)
+                    navigator.navigateBackToRoot()
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.purple)
+                .frame(maxWidth: .infinity)
+                .font(.headline)
+                .padding(.horizontal)
+
+                Spacer()
             }
-            .padding()
-            .background(.gray.opacity(0.1))
-            .cornerRadius(12)
-
-            Button("Save & Return") {
-                // Append to history here, only once, including notes
-                _ = viewModel.completeWorkout(note: noteText)
-                navigator.navigateBackToRoot()
-            }
-            .buttonStyle(.borderedProminent)
-
-            Spacer()
+            .padding(.top, 40)
+            .padding(.bottom, 20)
         }
-        .padding()
     }
 
+    // MARK: - Helpers
     func formatDate(_ date: Date?) -> String {
         guard let date else { return "N/A" }
         let formatter = DateFormatter()
@@ -62,4 +77,10 @@ struct WorkoutSummaryView: View {
         let seconds = Int(time) % 60
         return String(format: "%02d:%02d", minutes, seconds)
     }
+}
+
+#Preview {
+    WorkoutSummaryView(viewModel: WorkoutViewModel(),
+                       workout: Workout(name: "Running", date: Date(), duration: 1800))
+        .environmentObject(MyNavigator())
 }

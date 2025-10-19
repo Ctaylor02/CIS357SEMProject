@@ -1,55 +1,55 @@
-//
-//  ContentView.swift
-//  CIS357Project
-//
-//  Created by Sam Uptigrove on 10/12/25.
-//
-
 import SwiftUI
 
 struct ContentView: View {
-    // Accept the view model from the app and promote it to a StateObject for stability.
     @StateObject private var viewModel: WorkoutViewModel
     @EnvironmentObject private var navigator: MyNavigator
 
-    // Custom initializer to wrap the injected instance.
     init(viewModel: WorkoutViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     var body: some View {
         NavigationStack(path: $navigator.navPath) {
-            VStack(spacing: 24) {
-                Text("Workout Tracker")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .padding(.top)
+            ZStack {
+                LinearGradient(colors: [Color.blue.opacity(0.3), Color.purple.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .ignoresSafeArea()
 
-                Picker("Workout", selection: $viewModel.selectedWorkout) {
-                    ForEach(viewModel.workouts) { workout in
-                        Text(workout.name).tag(workout)
+                VStack(spacing: 30) {
+                    Text("Workout Tracker")
+                        .font(.system(size: 36, weight: .heavy, design: .rounded))
+                        .foregroundStyle(.linearGradient(colors: [.pink, .purple], startPoint: .top, endPoint: .bottom))
+                        .shadow(radius: 5)
+
+                    Picker("Workout", selection: $viewModel.selectedWorkout) {
+                        ForEach(viewModel.workouts) { workout in
+                            Text(workout.name).tag(workout)
+                        }
                     }
-                }
-                .pickerStyle(.menu)
+                    .pickerStyle(.menu)
+                    .padding()
+                    .background(.white.opacity(0.3))
+                    .cornerRadius(12)
+                    .shadow(radius: 3)
 
-                Button("Start") {
-                    viewModel.startWorkout()
-                    // Example navigation to the selected workout detail.
-                    navigator.navigate(to: .workout(viewModel.selectedWorkout))
-                }
-                .buttonStyle(.borderedProminent)
-                .padding(.top, 10)
+                    Button("Start") {
+                        viewModel.startWorkout()
+                        navigator.navigate(to: .workout(viewModel.selectedWorkout))
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.purple)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal)
 
-                Button {
-                    navigator.navigate(to: .History)
-                } label: {
-                    Text("History")
-                        .frame(maxWidth: .infinity)
+                    Button("History") {
+                        navigator.navigate(to: .History)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.blue)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal)
                 }
-                .buttonStyle(.bordered)
-                .padding(.top, 8)
+                .padding()
             }
-            .padding()
             .navigationDestination(for: Route.self) { route in
                 switch route {
                 case .History:
