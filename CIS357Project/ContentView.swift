@@ -3,6 +3,8 @@ import SwiftUI
 struct ContentView: View {
     @StateObject private var viewModel: WorkoutViewModel
     @EnvironmentObject private var navigator: MyNavigator
+    @State private var showAddWorkout = false
+    @State private var newWorkoutName = ""
 
     init(viewModel: WorkoutViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -11,7 +13,9 @@ struct ContentView: View {
     var body: some View {
         NavigationStack(path: $navigator.navPath) {
             ZStack {
-                LinearGradient(colors: [Color.blue.opacity(0.3), Color.purple.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                LinearGradient(colors: [Color.blue.opacity(0.3), Color.purple.opacity(0.2)],
+                               startPoint: .topLeading,
+                               endPoint: .bottomTrailing)
                     .ignoresSafeArea()
 
                 VStack(spacing: 30) {
@@ -47,9 +51,48 @@ struct ContentView: View {
                     .tint(.blue)
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal)
+
+                    Button("Add Custom Workout") {
+                        showAddWorkout.toggle()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.green)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal)
                 }
                 .padding()
             }
+            // MARK: - Sheet for Adding Custom Workout
+            .sheet(isPresented: $showAddWorkout) {
+                VStack(spacing: 20) {
+                    Text("Add New Workout")
+                        .font(.title2)
+                        .fontWeight(.bold)
+
+                    TextField("Workout Name", text: $newWorkoutName)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding(.horizontal)
+
+                    Button("Save") {
+                        guard !newWorkoutName.isEmpty else { return }
+                        let workout = Workout(name: newWorkoutName)
+                        viewModel.workouts.append(workout)
+                        viewModel.selectedWorkout = workout
+                        newWorkoutName = ""
+                        showAddWorkout = false
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.green)
+
+                    Button("Cancel") {
+                        showAddWorkout = false
+                        newWorkoutName = ""
+                    }
+                    .buttonStyle(.bordered)
+                }
+                .padding()
+            }
+            // MARK: - Navigation Destinations
             .navigationDestination(for: Route.self) { route in
                 switch route {
                 case .History:
