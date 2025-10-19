@@ -3,6 +3,8 @@ import Charts
 
 struct HistoryView: View {
     @ObservedObject var viewModel: WorkoutViewModel
+    @State private var workoutToDelete: Workout?
+    @State private var showDeleteAlert = false
 
     var body: some View {
         ScrollView {
@@ -65,7 +67,7 @@ struct HistoryView: View {
                     .padding(.horizontal)
                 }
 
-                // MARK: - Workout List (Scrollable with Delete Button)
+                // MARK: - Workout List (LazyVStack with Delete)
                 if viewModel.history.isEmpty {
                     Text("No workouts completed yet.")
                         .foregroundStyle(.secondary)
@@ -91,8 +93,8 @@ struct HistoryView: View {
                                     }
                                     Spacer()
                                     Button(action: {
-                                        // Delete workout
-                                        viewModel.history.remove(at: index)
+                                        workoutToDelete = workout
+                                        showDeleteAlert = true
                                     }) {
                                         Image(systemName: "trash")
                                             .foregroundColor(.red)
@@ -120,6 +122,19 @@ struct HistoryView: View {
         )
         .navigationTitle("Workout History")
         .navigationBarTitleDisplayMode(.inline)
+        .alert(isPresented: $showDeleteAlert) {
+            Alert(
+                title: Text("Delete Workout"),
+                message: Text("Are you sure you want to delete this workout?"),
+                primaryButton: .destructive(Text("Delete")) {
+                    if let workout = workoutToDelete,
+                       let index = viewModel.history.firstIndex(of: workout) {
+                        withAnimation { viewModel.history.remove(at: index) }
+                    }
+                },
+                secondaryButton: .cancel()
+            )
+        }
     }
 
     // MARK: - Helpers

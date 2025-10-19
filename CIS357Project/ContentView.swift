@@ -5,6 +5,7 @@ struct ContentView: View {
     @EnvironmentObject private var navigator: MyNavigator
     @State private var showAddWorkout = false
     @State private var newWorkoutName = ""
+    @State private var showAchievementBanner = false
 
     init(viewModel: WorkoutViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -18,12 +19,24 @@ struct ContentView: View {
                                endPoint: .bottomTrailing)
                     .ignoresSafeArea()
 
-                VStack(spacing: 30) {
+                VStack(spacing: 25) {
+                    // MARK: - Title
                     Text("Workout Tracker")
                         .font(.system(size: 36, weight: .heavy, design: .rounded))
                         .foregroundStyle(.linearGradient(colors: [.pink, .purple], startPoint: .top, endPoint: .bottom))
                         .shadow(radius: 5)
 
+                    // MARK: - Streak Info
+                    VStack(spacing: 5) {
+                        Text("🔥 Current Streak: \(viewModel.currentStreak) day(s)")
+                            .font(.headline)
+                            .foregroundColor(.orange)
+                        Text("🏆 Longest Streak: \(viewModel.longestStreak) day(s)")
+                            .font(.subheadline)
+                            .foregroundColor(.yellow)
+                    }
+
+                    // MARK: - Picker
                     Picker("Workout", selection: $viewModel.selectedWorkout) {
                         ForEach(viewModel.workouts) { workout in
                             Text(workout.name).tag(workout)
@@ -35,6 +48,7 @@ struct ContentView: View {
                     .cornerRadius(12)
                     .shadow(radius: 3)
 
+                    // MARK: - Buttons
                     Button("Start") {
                         viewModel.startWorkout()
                         navigator.navigate(to: .workout(viewModel.selectedWorkout))
@@ -61,6 +75,30 @@ struct ContentView: View {
                     .padding(.horizontal)
                 }
                 .padding()
+                .onReceive(viewModel.$recentAchievement) { achievement in
+                    if achievement != nil {
+                        showAchievementBanner = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                            showAchievementBanner = false
+                        }
+                    }
+                }
+
+                // MARK: - Achievement Banner
+                if showAchievementBanner, let achievement = viewModel.recentAchievement {
+                    VStack {
+                        Spacer()
+                        Text("🏅 \(achievement)")
+                            .font(.headline)
+                            .padding()
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(12)
+                            .shadow(radius: 5)
+                            .padding()
+                    }
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .animation(.easeInOut, value: showAchievementBanner)
+                }
             }
             // MARK: - Sheet for Adding Custom Workout
             .sheet(isPresented: $showAddWorkout) {
