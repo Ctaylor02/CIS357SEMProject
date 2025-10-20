@@ -65,6 +65,15 @@ struct ContentView: View {
                     .tint(.blue)
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal)
+                    
+                    Button {
+                        navigator.navigate(to: .stepCount)
+                            } label: {
+                                Text("Step Count")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.bordered)
+                            .padding(.top, 8)
 
                     Button("Add Custom Workout") {
                         showAddWorkout.toggle()
@@ -139,6 +148,8 @@ struct ContentView: View {
                     TrackWorkoutView(viewModel: viewModel, workout: workout)
                 case .summary(let workout):
                     WorkoutSummaryView(viewModel: viewModel, workout: workout)
+                case .stepCount:
+                    StepCountView(viewModel: viewModel)
                 }
             }
         }

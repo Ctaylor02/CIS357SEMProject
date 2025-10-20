@@ -6,6 +6,9 @@ class WorkoutViewModel: ObservableObject {
     @Published var workouts: [Workout]
     @Published var selectedWorkout: Workout
     @Published var history: [Workout] = []
+    @Published var dailySteps: Int = 8000
+    @Published var weeklySteps: Int = 56000
+    @Published var monthlySteps: Int = 224000
 
 
 
@@ -80,21 +83,13 @@ class WorkoutViewModel: ObservableObject {
     func completeWorkout(note: String? = nil) -> Workout {
         stopTimer()
         let completed = Workout(
-<<<<<<< HEAD
                     name: selectedWorkout.name,
                     date: Date(),
                     duration: elapsedTime,
                     isCompleted: true,
                     note: note
                 )
-=======
-            name: selectedWorkout.name,
-            date: Date(),
-            duration: elapsedTime,
-            isCompleted: true,
-            note: note
-        )
->>>>>>> Caleb/history
+
         history.append(completed)
         
         // Update streak

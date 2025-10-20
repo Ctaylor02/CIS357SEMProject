@@ -11,6 +11,7 @@ enum Route: Hashable {
     case History
     case workout(Workout)
     case summary(Workout)
+    case stepCount
 }
 
 class MyNavigator: ObservableObject {
