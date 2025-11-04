@@ -3,10 +3,11 @@ import Combine
 import SwiftUI
 
 class WorkoutViewModel: ObservableObject {
+    @EnvironmentObject var healthKit: HealthkitIntegration
     @Published var workouts: [Workout]
     @Published var selectedWorkout: Workout
     @Published var history: [Workout] = []
-    @Published var dailySteps: Int = 8000
+//    @Published var dailySteps: String = dailySteps()
     @Published var weeklySteps: Int = 56000
     @Published var monthlySteps: Int = 224000
 
