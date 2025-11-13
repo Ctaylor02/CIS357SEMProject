@@ -15,14 +15,14 @@ struct ContentView: View {
     var body: some View {
         NavigationStack(path: $navigator.navPath) {
             ZStack {
-                // MARK: - Background Gradient
+                // Background Gradient
                 LinearGradient(colors: [Color.blue.opacity(0.3), Color.purple.opacity(0.2)],
                                startPoint: .topLeading,
                                endPoint: .bottomTrailing)
                     .ignoresSafeArea()
 
                 VStack(spacing: 25) {
-                    // MARK: - Header with Settings Button
+                    // Header with Settings Button
                     HStack {
                         Text("Workout Tracker")
                             .font(.system(size: 36, weight: .heavy, design: .rounded))
@@ -47,7 +47,7 @@ struct ContentView: View {
                     }
                     .padding(.horizontal)
 
-                    // MARK: - Streak Info
+                    // Streak Info
                     VStack(spacing: 5) {
                         Text("🔥 Current Streak: \(viewModel.currentStreak) day(s)")
                             .font(.headline)
@@ -57,7 +57,7 @@ struct ContentView: View {
                             .foregroundColor(.yellow)
                     }
 
-                    // MARK: - Workout Picker
+                    // Workout Picker
                     Picker("Workout", selection: $viewModel.selectedWorkout) {
                         ForEach(viewModel.workouts) { workout in
                             Text(workout.name).tag(workout)
@@ -69,7 +69,7 @@ struct ContentView: View {
                     .cornerRadius(12)
                     .shadow(radius: 3)
 
-                    // MARK: - Buttons
+                    // Buttons
                     VStack(spacing: 12) {
                         Button("Start") {
                             viewModel.startWorkout()
@@ -120,7 +120,7 @@ struct ContentView: View {
                     }
                 }
 
-                // MARK: - Achievement Banner
+                //  Achievement Banner
                 if showAchievementBanner, let achievement = viewModel.recentAchievement {
                     VStack {
                         Spacer()
@@ -136,7 +136,7 @@ struct ContentView: View {
                     .animation(.easeInOut, value: showAchievementBanner)
                 }
             }
-            // MARK: - Add Workout Sheet
+            //  Add Workout Sheet
             .sheet(isPresented: $showAddWorkout) {
                 VStack(spacing: 20) {
                     Text("Add New Workout")
@@ -166,7 +166,7 @@ struct ContentView: View {
                 }
                 .padding()
             }
-            // MARK: - Settings Sheet
+            //  Settings Sheet
             .sheet(isPresented: $showSettings) {
                 SettingsView(viewModel: viewModel)
             }

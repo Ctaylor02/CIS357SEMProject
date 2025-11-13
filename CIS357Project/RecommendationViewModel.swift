@@ -11,7 +11,7 @@ class RecommendationViewModel: ObservableObject {
     @MainActor
     func generateRecommendation() {
         let weekday = Calendar.current.component(.weekday, from: Date())
-        // Sunday = 1 ... Saturday = 7
+        // Sunday = 1
 
         switch weekday {
         case 1:
