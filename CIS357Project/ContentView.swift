@@ -6,7 +6,7 @@ struct ContentView: View {
     @State private var showAddWorkout = false
     @State private var newWorkoutName = ""
     @State private var showAchievementBanner = false
-    @State private var showSettings = false // ✅ New state for settings
+    @State private var showSettings = false // Settings sheet
 
     init(viewModel: WorkoutViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -70,38 +70,44 @@ struct ContentView: View {
                     .shadow(radius: 3)
 
                     // MARK: - Buttons
-                    Button("Start") {
-                        viewModel.startWorkout()
-                        navigator.navigate(to: .workout(viewModel.selectedWorkout))
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.purple)
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal)
+                    VStack(spacing: 12) {
+                        Button("Start") {
+                            viewModel.startWorkout()
+                            navigator.navigate(to: .workout(viewModel.selectedWorkout))
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.purple)
+                        .frame(maxWidth: .infinity)
 
-                    Button("History") {
-                        navigator.navigate(to: .History)
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.blue)
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal)
-                    
-                    Button {
-                        navigator.navigate(to: .stepCount)
-                    } label: {
-                        Text("Step Count")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .padding(.top, 8)
+                        Button("History") {
+                            navigator.navigate(to: .History)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.blue)
+                        .frame(maxWidth: .infinity)
 
-                    Button("Add Custom Workout") {
-                        showAddWorkout.toggle()
+                        Button {
+                            navigator.navigate(to: .stepCount)
+                        } label: {
+                            Text("Step Count")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+
+                        Button("Daily Recommendation") {
+                            navigator.navigate(to: .recommendation)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.orange)
+                        .frame(maxWidth: .infinity)
+
+                        Button("Add Custom Workout") {
+                            showAddWorkout.toggle()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.green)
+                        .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.green)
-                    .frame(maxWidth: .infinity)
                     .padding(.horizontal)
                 }
                 .padding()
@@ -162,7 +168,7 @@ struct ContentView: View {
             }
             // MARK: - Settings Sheet
             .sheet(isPresented: $showSettings) {
-                SettingsView(viewModel: viewModel) // ✅ Uses the same viewModel
+                SettingsView(viewModel: viewModel)
             }
             // MARK: - Navigation Destinations
             .navigationDestination(for: Route.self) { route in
@@ -175,6 +181,8 @@ struct ContentView: View {
                     WorkoutSummaryView(viewModel: viewModel, workout: workout)
                 case .stepCount:
                     StepCountView(viewModel: viewModel)
+                case .recommendation:
+                    RecommendationView()
                 }
             }
         }
