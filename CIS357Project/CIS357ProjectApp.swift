@@ -11,13 +11,18 @@ import SwiftUI
 struct CIS357ProjectApp: App {
     @StateObject private var viewModel = WorkoutViewModel()
     @StateObject private var navigator = MyNavigator()
-    @StateObject private var Healthkit = HealthkitIntegration()
+    @StateObject private var healthKit = HealthkitIntegration()
+
+    //Global Theme Manager
+    @StateObject private var theme = ThemeManager()
 
     var body: some Scene {
         WindowGroup {
             ContentView(viewModel: viewModel)
                 .environmentObject(navigator)
-                .environmentObject(Healthkit)
+                .environmentObject(healthKit)
+                .environmentObject(theme)   // ← give entire app access to theme
+                .preferredColorScheme(theme.isDarkMode ? .dark : .light)  // ← APPLY THEME GLOBALLY
         }
     }
 }

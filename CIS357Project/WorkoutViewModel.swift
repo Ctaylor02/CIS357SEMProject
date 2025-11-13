@@ -14,9 +14,12 @@ class WorkoutViewModel: ObservableObject {
     @Published var workouts: [Workout]
     @Published var selectedWorkout: Workout
     
-    // Whenever history changes, it automatically saves to UserDefaults
+    // Automatically save whenever history changes
     @Published var history: [Workout] = [] {
-        didSet { saveHistory() }
+        didSet {
+            saveHistory()
+            updateProgressStats()
+        }
     }
 
     @Published var weeklySteps: Int = 56000
@@ -34,10 +37,13 @@ class WorkoutViewModel: ObservableObject {
     @Published private(set) var currentStreak: Int = 0
     @Published private(set) var longestStreak: Int = 0
 
-    //- Persistence Key
+    // Persistence Keys
     private let historyKey = "savedWorkoutHistory"
+    private let streakKey = "savedStreakData"
 
-    //  - Init
+    private var cancellables = Set<AnyCancellable>()
+
+    // MARK: - Init
     init() {
         let defaultWorkouts = [
             Workout(name: "Running"),
@@ -48,11 +54,21 @@ class WorkoutViewModel: ObservableObject {
         self.workouts = defaultWorkouts
         self.selectedWorkout = defaultWorkouts.first!
 
-        // Load any saved history on launch
+        // Load saved data
         loadHistory()
+        loadStreakData()
 
-        // Recalculate streaks on launch
+        // Recalculate streaks and charts
         recalcStreak()
+        updateProgressStats()
+
+        // Auto-save when app goes to background
+        NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)
+            .sink { [weak self] _ in
+                self?.saveHistory()
+                self?.saveStreakData()
+            }
+            .store(in: &cancellables)
     }
 
     //  Timer controls
@@ -94,7 +110,7 @@ class WorkoutViewModel: ObservableObject {
         isPaused = false
     }
 
-    //  Workout management
+    // Workout Management
     func startWorkout() {
         startTimer()
         print("Started \(selectedWorkout.name)")
@@ -111,25 +127,26 @@ class WorkoutViewModel: ObservableObject {
         )
 
         history.append(completed)
-        
-        // Update streak
         updateStreak(for: completed.date ?? Date())
-
-        // Check milestones
         checkAchievements()
-
+        saveHistory()
+        saveStreakData()
         return completed
     }
 
     func deleteWorkout(at offsets: IndexSet) {
         history.remove(atOffsets: offsets)
         recalcStreak()
+        saveHistory()
+        saveStreakData()
     }
 
     func clearHistory() {
         history.removeAll()
         currentStreak = 0
         longestStreak = 0
+        saveHistory()
+        saveStreakData()
     }
 
     // Streak Calculation
@@ -163,7 +180,7 @@ class WorkoutViewModel: ObservableObject {
         }
     }
 
-    // Achievements
+    //  Achievements
     private func checkAchievements() {
         recentAchievement = nil
 
@@ -179,22 +196,55 @@ class WorkoutViewModel: ObservableObject {
     }
 
     // Persistence
-    private func saveHistory() {
+    func saveHistory() {
         do {
             let encoded = try JSONEncoder().encode(history)
             UserDefaults.standard.set(encoded, forKey: historyKey)
         } catch {
-            print("❌ Failed to save workout history: \(error)")
+            print(" Failed to save workout history: \(error)")
         }
     }
 
-    private func loadHistory() {
+    func loadHistory() {
         guard let data = UserDefaults.standard.data(forKey: historyKey) else { return }
         do {
             history = try JSONDecoder().decode([Workout].self, from: data)
         } catch {
-            print("❌ Failed to load workout history: \(error)")
+            print(" Failed to load workout history: \(error)")
             history = []
         }
+    }
+
+    func saveStreakData() {
+        let streakData = ["current": currentStreak, "longest": longestStreak]
+        UserDefaults.standard.set(streakData, forKey: streakKey)
+    }
+
+    func loadStreakData() {
+        guard let streakData = UserDefaults.standard.dictionary(forKey: streakKey) as? [String: Int] else { return }
+        currentStreak = streakData["current"] ?? 0
+        longestStreak = streakData["longest"] ?? 0
+    }
+
+    func resetStreakData() {
+        currentStreak = 0
+        longestStreak = 0
+        recentAchievement = nil
+        UserDefaults.standard.removeObject(forKey: streakKey)
+    }
+
+    // Dynamic Progress Stats
+    private func updateProgressStats() {
+        //  total workout count in the past week/month
+        let calendar = Calendar.current
+        let now = Date()
+        let oneWeekAgo = calendar.date(byAdding: .day, value: -7, to: now)!
+        let oneMonthAgo = calendar.date(byAdding: .day, value: -30, to: now)!
+
+        let weeklyWorkouts = history.filter { $0.date ?? now >= oneWeekAgo }
+        let monthlyWorkouts = history.filter { $0.date ?? now >= oneMonthAgo }
+
+        weeklySteps = weeklyWorkouts.count * 8000 //
+        monthlySteps = monthlyWorkouts.count * 8000
     }
 }

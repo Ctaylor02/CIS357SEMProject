@@ -6,6 +6,7 @@ struct ContentView: View {
     @State private var showAddWorkout = false
     @State private var newWorkoutName = ""
     @State private var showAchievementBanner = false
+    @State private var showSettings = false // ✅ New state for settings
 
     init(viewModel: WorkoutViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -14,17 +15,37 @@ struct ContentView: View {
     var body: some View {
         NavigationStack(path: $navigator.navPath) {
             ZStack {
+                // MARK: - Background Gradient
                 LinearGradient(colors: [Color.blue.opacity(0.3), Color.purple.opacity(0.2)],
                                startPoint: .topLeading,
                                endPoint: .bottomTrailing)
                     .ignoresSafeArea()
 
                 VStack(spacing: 25) {
-                    // MARK: - Title
-                    Text("Workout Tracker")
-                        .font(.system(size: 36, weight: .heavy, design: .rounded))
-                        .foregroundStyle(.linearGradient(colors: [.pink, .purple], startPoint: .top, endPoint: .bottom))
-                        .shadow(radius: 5)
+                    // MARK: - Header with Settings Button
+                    HStack {
+                        Text("Workout Tracker")
+                            .font(.system(size: 36, weight: .heavy, design: .rounded))
+                            .foregroundStyle(.linearGradient(colors: [.pink, .purple], startPoint: .top, endPoint: .bottom))
+                            .shadow(radius: 5)
+
+                        Spacer()
+
+                        Button {
+                            withAnimation(.easeInOut) {
+                                showSettings.toggle()
+                            }
+                        } label: {
+                            Image(systemName: "gearshape.fill")
+                                .font(.system(size: 24))
+                                .foregroundColor(.purple)
+                                .padding(8)
+                                .background(.white.opacity(0.3))
+                                .clipShape(Circle())
+                                .shadow(radius: 3)
+                        }
+                    }
+                    .padding(.horizontal)
 
                     // MARK: - Streak Info
                     VStack(spacing: 5) {
@@ -36,7 +57,7 @@ struct ContentView: View {
                             .foregroundColor(.yellow)
                     }
 
-                    // MARK: - Picker
+                    // MARK: - Workout Picker
                     Picker("Workout", selection: $viewModel.selectedWorkout) {
                         ForEach(viewModel.workouts) { workout in
                             Text(workout.name).tag(workout)
@@ -68,12 +89,12 @@ struct ContentView: View {
                     
                     Button {
                         navigator.navigate(to: .stepCount)
-                            } label: {
-                                Text("Step Count")
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(.bordered)
-                            .padding(.top, 8)
+                    } label: {
+                        Text("Step Count")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .padding(.top, 8)
 
                     Button("Add Custom Workout") {
                         showAddWorkout.toggle()
@@ -109,7 +130,7 @@ struct ContentView: View {
                     .animation(.easeInOut, value: showAchievementBanner)
                 }
             }
-            // MARK: - Sheet for Adding Custom Workout
+            // MARK: - Add Workout Sheet
             .sheet(isPresented: $showAddWorkout) {
                 VStack(spacing: 20) {
                     Text("Add New Workout")
@@ -138,6 +159,10 @@ struct ContentView: View {
                     .buttonStyle(.bordered)
                 }
                 .padding()
+            }
+            // MARK: - Settings Sheet
+            .sheet(isPresented: $showSettings) {
+                SettingsView(viewModel: viewModel) // ✅ Uses the same viewModel
             }
             // MARK: - Navigation Destinations
             .navigationDestination(for: Route.self) { route in
