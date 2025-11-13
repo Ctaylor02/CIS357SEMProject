@@ -1,3 +1,10 @@
+//
+//  WorkoutViewModel.swift
+//  CIS357Project
+//
+//  Created by Caleb Taylor on 10/18/25.
+//
+
 import Foundation
 import Combine
 import SwiftUI
@@ -6,12 +13,14 @@ class WorkoutViewModel: ObservableObject {
     @EnvironmentObject var healthKit: HealthkitIntegration
     @Published var workouts: [Workout]
     @Published var selectedWorkout: Workout
-    @Published var history: [Workout] = []
-//    @Published var dailySteps: String = dailySteps()
+    
+    // Whenever history changes, it automatically saves to UserDefaults
+    @Published var history: [Workout] = [] {
+        didSet { saveHistory() }
+    }
+
     @Published var weeklySteps: Int = 56000
     @Published var monthlySteps: Int = 224000
-
-
 
     // Timer
     @Published var elapsedTime: TimeInterval = 0
@@ -25,6 +34,10 @@ class WorkoutViewModel: ObservableObject {
     @Published private(set) var currentStreak: Int = 0
     @Published private(set) var longestStreak: Int = 0
 
+    // MARK: - Persistence Key
+    private let historyKey = "savedWorkoutHistory"
+
+    // MARK: - Init
     init() {
         let defaultWorkouts = [
             Workout(name: "Running"),
@@ -34,6 +47,12 @@ class WorkoutViewModel: ObservableObject {
         ]
         self.workouts = defaultWorkouts
         self.selectedWorkout = defaultWorkouts.first!
+
+        // Load any saved history on launch
+        loadHistory()
+
+        // Recalculate streaks on launch
+        recalcStreak()
     }
 
     // MARK: - Timer controls
@@ -84,17 +103,17 @@ class WorkoutViewModel: ObservableObject {
     func completeWorkout(note: String? = nil) -> Workout {
         stopTimer()
         let completed = Workout(
-                    name: selectedWorkout.name,
-                    date: Date(),
-                    duration: elapsedTime,
-                    isCompleted: true,
-                    note: note
-                )
+            name: selectedWorkout.name,
+            date: Date(),
+            duration: elapsedTime,
+            isCompleted: true,
+            note: note
+        )
 
         history.append(completed)
         
         // Update streak
-        updateStreak(for: completed.date!)
+        updateStreak(for: completed.date ?? Date())
 
         // Check milestones
         checkAchievements()
@@ -156,6 +175,26 @@ class WorkoutViewModel: ObservableObject {
             recentAchievement = "10 Workouts Completed!"
         } else if currentStreak == 7 {
             recentAchievement = "7-Day Streak!"
+        }
+    }
+
+    // MARK: - Persistence
+    private func saveHistory() {
+        do {
+            let encoded = try JSONEncoder().encode(history)
+            UserDefaults.standard.set(encoded, forKey: historyKey)
+        } catch {
+            print("❌ Failed to save workout history: \(error)")
+        }
+    }
+
+    private func loadHistory() {
+        guard let data = UserDefaults.standard.data(forKey: historyKey) else { return }
+        do {
+            history = try JSONDecoder().decode([Workout].self, from: data)
+        } catch {
+            print("❌ Failed to load workout history: \(error)")
+            history = []
         }
     }
 }
