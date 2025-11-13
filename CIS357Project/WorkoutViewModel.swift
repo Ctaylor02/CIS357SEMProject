@@ -34,10 +34,10 @@ class WorkoutViewModel: ObservableObject {
     @Published private(set) var currentStreak: Int = 0
     @Published private(set) var longestStreak: Int = 0
 
-    // MARK: - Persistence Key
+    //- Persistence Key
     private let historyKey = "savedWorkoutHistory"
 
-    // MARK: - Init
+    //  - Init
     init() {
         let defaultWorkouts = [
             Workout(name: "Running"),
@@ -55,7 +55,7 @@ class WorkoutViewModel: ObservableObject {
         recalcStreak()
     }
 
-    // MARK: - Timer controls
+    //  Timer controls
     func startTimer() {
         startDate = Date()
         elapsedTime = 0
@@ -94,7 +94,7 @@ class WorkoutViewModel: ObservableObject {
         isPaused = false
     }
 
-    // MARK: - Workout management
+    //  Workout management
     func startWorkout() {
         startTimer()
         print("Started \(selectedWorkout.name)")
@@ -132,7 +132,7 @@ class WorkoutViewModel: ObservableObject {
         longestStreak = 0
     }
 
-    // MARK: - Streak Calculation
+    // Streak Calculation
     private func updateStreak(for date: Date) {
         let calendar = Calendar.current
         guard let lastWorkout = history.dropLast().last?.date else {
@@ -163,7 +163,7 @@ class WorkoutViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Achievements
+    // Achievements
     private func checkAchievements() {
         recentAchievement = nil
 
@@ -178,7 +178,7 @@ class WorkoutViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Persistence
+    // Persistence
     private func saveHistory() {
         do {
             let encoded = try JSONEncoder().encode(history)
