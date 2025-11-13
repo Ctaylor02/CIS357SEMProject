@@ -8,6 +8,21 @@ struct ContentView: View {
     @State private var showAchievementBanner = false
     @State private var showSettings = false // Settings sheet
 
+    // Daily Quote
+    private var dailyQuote: String {
+        let quotes = [
+            "Push yourself, because no one else will.",
+            "The only bad workout is the one that didn’t happen.",
+            "Sweat is just fat crying.",
+            "Don’t limit your challenges. Challenge your limits.",
+            "Strive for progress, not perfection.",
+            "Your body can stand almost anything. It’s your mind you have to convince.",
+            "Small steps every day add up to big results."
+        ]
+        let weekday = Calendar.current.component(.weekday, from: Date())
+        return quotes[(weekday - 1) % quotes.count]
+    }
+
     init(viewModel: WorkoutViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -21,12 +36,17 @@ struct ContentView: View {
                                endPoint: .bottomTrailing)
                     .ignoresSafeArea()
 
+                // Floating Icons
+                FloatingIconsView()
+
                 VStack(spacing: 25) {
-                    // Header with Settings Button
+                    //  - Header with Settings Button
                     HStack {
                         Text("Workout Tracker")
                             .font(.system(size: 36, weight: .heavy, design: .rounded))
-                            .foregroundStyle(.linearGradient(colors: [.pink, .purple], startPoint: .top, endPoint: .bottom))
+                            .foregroundStyle(.linearGradient(colors: [.pink, .purple],
+                                                             startPoint: .top,
+                                                             endPoint: .bottom))
                             .shadow(radius: 5)
 
                         Spacer()
@@ -47,7 +67,15 @@ struct ContentView: View {
                     }
                     .padding(.horizontal)
 
-                    // Streak Info
+                    // Daily Quote
+                    Text("💡 \(dailyQuote)")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal)
+                        .multilineTextAlignment(.center)
+
+                    //  Streak Info
                     VStack(spacing: 5) {
                         Text("🔥 Current Streak: \(viewModel.currentStreak) day(s)")
                             .font(.headline)
@@ -166,7 +194,7 @@ struct ContentView: View {
                 }
                 .padding()
             }
-            //  Settings Sheet
+            // Settings Sheet
             .sheet(isPresented: $showSettings) {
                 SettingsView(viewModel: viewModel)
             }
@@ -184,6 +212,27 @@ struct ContentView: View {
                 case .recommendation:
                     RecommendationView()
                 }
+            }
+        }
+    }
+}
+
+// Floating Icons
+struct FloatingIconsView: View {
+    @State private var positions: [CGSize] = Array(repeating: .zero, count: 10)
+
+    var body: some View {
+        GeometryReader { geo in
+            ForEach(0..<positions.count, id: \.self) { i in
+                Image(systemName: ["heart.fill", "star.fill", "flame.fill", "bolt.fill"].randomElement()!)
+                    .foregroundColor([.pink, .yellow, .orange, .purple].randomElement())
+                    .opacity(0.4)
+                    .position(x: CGFloat.random(in: 0...geo.size.width),
+                              y: CGFloat.random(in: 0...geo.size.height))
+                    .scaleEffect(CGFloat.random(in: 0.5...1.2))
+                    .animation(Animation.easeInOut(duration: Double.random(in: 3...6))
+                        .repeatForever(autoreverses: true)
+                        .delay(Double.random(in: 0...2)), value: positions[i])
             }
         }
     }
