@@ -23,7 +23,7 @@ class RecommendationViewModel: ObservableObject {
         case 2:
             todayRecommendation = DailyRecommendation(
                 day: "Monday",
-                workout: WorkoutSuggestion(name: "Running", sets: 1, reps: nil, durationMinutes: 30),
+                workout: WorkoutSuggestion(name: "Running", sets: 2, reps: nil, durationMinutes: 30),
                 meal: MealSuggestion(name: "Oatmeal & Berries", calories: 350, description: "Oats with mixed berries and almonds")
             )
         case 3:

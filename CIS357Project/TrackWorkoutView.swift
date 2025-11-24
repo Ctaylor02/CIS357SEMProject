@@ -12,7 +12,7 @@ struct TrackWorkoutView: View {
             "You're stronger than yesterday!",
             "Almost there, stay focused!",
             "One step at a time!",
-            "Feel the burn, love the results!"
+            "Feel the burn! Love the results!"
         ]
         return messages.randomElement()!
     }

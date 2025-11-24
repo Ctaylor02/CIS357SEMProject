@@ -12,6 +12,8 @@ struct CIS357ProjectApp: App {
     @StateObject private var viewModel = WorkoutViewModel()
     @StateObject private var navigator = MyNavigator()
     @StateObject private var healthKit = HealthkitIntegration()
+    @StateObject private var profileManager = UserProfileManager()
+
 
     //Global Theme Manager
     @StateObject private var theme = ThemeManager()
@@ -20,6 +22,7 @@ struct CIS357ProjectApp: App {
         WindowGroup {
             ContentView(viewModel: viewModel)
                 .environmentObject(navigator)
+                .environmentObject(profileManager)
                 .environmentObject(healthKit)
                 .environmentObject(theme)   // ← give entire app access to theme
                 .preferredColorScheme(theme.isDarkMode ? .dark : .light)  // ← APPLY THEME GLOBALLY

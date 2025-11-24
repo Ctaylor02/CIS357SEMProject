@@ -1,24 +1,29 @@
+import Foundation
 import SwiftUI
+import Combine
 
 struct ContentView: View {
     @StateObject private var viewModel: WorkoutViewModel
     @EnvironmentObject private var navigator: MyNavigator
+    @EnvironmentObject private var profileManager: UserProfileManager  
+
     @State private var showAddWorkout = false
     @State private var newWorkoutName = ""
     @State private var showAchievementBanner = false
-    @State private var showSettings = false // Settings sheet
+    @State private var showSettings = false
 
-    // Daily Quote
+    // MARK: - Daily Quote
     private var dailyQuote: String {
         let quotes = [
             "Push yourself, because no one else will.",
             "The only bad workout is the one that didn’t happen.",
-            "Sweat is just fat crying.",
-            "Don’t limit your challenges. Challenge your limits.",
             "Strive for progress, not perfection.",
-            "Your body can stand almost anything. It’s your mind you have to convince.",
-            "Small steps every day add up to big results."
+            "Challenge your limits.",
+            "Small steps every day add up to big results.",
+            "Your body can handle it—your mind needs convincing.",
+            "Consistency beats intensity."
         ]
+
         let weekday = Calendar.current.component(.weekday, from: Date())
         return quotes[(weekday - 1) % quotes.count]
     }
@@ -30,17 +35,21 @@ struct ContentView: View {
     var body: some View {
         NavigationStack(path: $navigator.navPath) {
             ZStack {
-                // Background Gradient
-                LinearGradient(colors: [Color.blue.opacity(0.3), Color.purple.opacity(0.2)],
+                // Background
+                LinearGradient(colors: [Color.blue.opacity(0.3),
+                                        Color.purple.opacity(0.2)],
                                startPoint: .topLeading,
                                endPoint: .bottomTrailing)
-                    .ignoresSafeArea()
+                .ignoresSafeArea()
 
-                // Floating Icons
                 FloatingIconsView()
 
                 VStack(spacing: 25) {
-                    //  - Header with Settings Button
+
+                    todaysStatsCard
+                        .padding(.top, 20)
+
+                    //  Header + Settings Button
                     HStack {
                         Text("Workout Tracker")
                             .font(.system(size: 36, weight: .heavy, design: .rounded))
@@ -52,40 +61,40 @@ struct ContentView: View {
                         Spacer()
 
                         Button {
-                            withAnimation(.easeInOut) {
-                                showSettings.toggle()
-                            }
+                            withAnimation { showSettings.toggle() }
                         } label: {
                             Image(systemName: "gearshape.fill")
                                 .font(.system(size: 24))
                                 .foregroundColor(.purple)
                                 .padding(8)
-                                .background(.white.opacity(0.3))
+                                .background(.white.opacity(0.35))
                                 .clipShape(Circle())
                                 .shadow(radius: 3)
                         }
                     }
                     .padding(.horizontal)
 
-                    // Daily Quote
+                    //  Quote
                     Text("💡 \(dailyQuote)")
                         .font(.subheadline)
                         .fontWeight(.semibold)
                         .foregroundColor(.white)
-                        .padding(.horizontal)
                         .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                        .padding(.bottom, 5)
 
                     //  Streak Info
                     VStack(spacing: 5) {
                         Text("🔥 Current Streak: \(viewModel.currentStreak) day(s)")
                             .font(.headline)
                             .foregroundColor(.orange)
+
                         Text("🏆 Longest Streak: \(viewModel.longestStreak) day(s)")
                             .font(.subheadline)
                             .foregroundColor(.yellow)
                     }
 
-                    // Workout Picker
+                    //  Workout Picker
                     Picker("Workout", selection: $viewModel.selectedWorkout) {
                         ForEach(viewModel.workouts) { workout in
                             Text(workout.name).tag(workout)
@@ -93,11 +102,11 @@ struct ContentView: View {
                     }
                     .pickerStyle(.menu)
                     .padding()
-                    .background(.white.opacity(0.3))
+                    .background(.white.opacity(0.25))
                     .cornerRadius(12)
                     .shadow(radius: 3)
 
-                    // Buttons
+                    //  Buttons
                     VStack(spacing: 12) {
                         Button("Start") {
                             viewModel.startWorkout()
@@ -136,7 +145,13 @@ struct ContentView: View {
                         .tint(.green)
                         .frame(maxWidth: .infinity)
                     }
-                    .padding(.horizontal)
+
+                    Button("Profile") {
+                        navigator.navigate(to: .profile)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.pink)
+                    .frame(maxWidth: .infinity)
                 }
                 .padding()
                 .onReceive(viewModel.$recentAchievement) { achievement in
@@ -148,7 +163,7 @@ struct ContentView: View {
                     }
                 }
 
-                //  Achievement Banner
+                // Achievement Banner
                 if showAchievementBanner, let achievement = viewModel.recentAchievement {
                     VStack {
                         Spacer()
@@ -161,15 +176,14 @@ struct ContentView: View {
                             .padding()
                     }
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .animation(.easeInOut, value: showAchievementBanner)
                 }
             }
-            //  Add Workout Sheet
+
+            // Add Workout Sheet
             .sheet(isPresented: $showAddWorkout) {
                 VStack(spacing: 20) {
                     Text("Add New Workout")
-                        .font(.title2)
-                        .fontWeight(.bold)
+                        .font(.title2).bold()
 
                     TextField("Workout Name", text: $newWorkoutName)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -187,58 +201,84 @@ struct ContentView: View {
                     .tint(.green)
 
                     Button("Cancel") {
-                        showAddWorkout = false
                         newWorkoutName = ""
+                        showAddWorkout = false
                     }
                     .buttonStyle(.bordered)
                 }
                 .padding()
             }
+
             // Settings Sheet
             .sheet(isPresented: $showSettings) {
                 SettingsView(viewModel: viewModel)
             }
-            // MARK: - Navigation Destinations
+
+            // Navigation Destinations
             .navigationDestination(for: Route.self) { route in
                 switch route {
                 case .History:
                     HistoryView(viewModel: viewModel)
+
                 case .workout(let workout):
                     TrackWorkoutView(viewModel: viewModel, workout: workout)
+
                 case .summary(let workout):
                     WorkoutSummaryView(viewModel: viewModel, workout: workout)
+
                 case .stepCount:
                     StepCountView(viewModel: viewModel)
+
                 case .recommendation:
                     RecommendationView()
+
+                case .profile:
+                    ProfileView()
                 }
             }
         }
     }
 }
 
-// Floating Icons
-struct FloatingIconsView: View {
-    @State private var positions: [CGSize] = Array(repeating: .zero, count: 10)
+extension ContentView {
+    // Today's Stats Card
+    private var todaysStatsCard: some View {
+        let steps = viewModel.dailySteps
+        let calories = Int(Double(steps) * 0.04)
 
-    var body: some View {
-        GeometryReader { geo in
-            ForEach(0..<positions.count, id: \.self) { i in
-                Image(systemName: ["heart.fill", "star.fill", "flame.fill", "bolt.fill"].randomElement()!)
-                    .foregroundColor([.pink, .yellow, .orange, .purple].randomElement())
-                    .opacity(0.4)
-                    .position(x: CGFloat.random(in: 0...geo.size.width),
-                              y: CGFloat.random(in: 0...geo.size.height))
-                    .scaleEffect(CGFloat.random(in: 0.5...1.2))
-                    .animation(Animation.easeInOut(duration: Double.random(in: 3...6))
-                        .repeatForever(autoreverses: true)
-                        .delay(Double.random(in: 0...2)), value: positions[i])
-            }
+        let todaysWorkouts = viewModel.history.filter {
+            Calendar.current.isDateInToday($0.date ?? Date())
         }
-    }
-}
 
-#Preview {
-    ContentView(viewModel: WorkoutViewModel())
-        .environmentObject(MyNavigator())
+        let totalDuration = todaysWorkouts.reduce(0) { $0 + $1.duration }
+        let minutes = Int(totalDuration) / 60
+
+        return VStack(alignment: .leading, spacing: 8) {
+            Text("📊 Today's Stats")
+                .font(.title3)
+                .bold()
+                .foregroundColor(.white)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("🚶 Steps: \(steps)")
+                Text("🔥 Calories: \(calories) cal")
+                Text("⏱ Workout Time: \(minutes) min")
+                Text("🏋️ Workouts Completed: \(todaysWorkouts.count)")
+            }
+            .font(.headline)
+            .foregroundColor(.white)
+
+        }
+        .padding()
+        .frame(maxWidth: .infinity)
+        .background(
+            LinearGradient(colors: [.purple, .pink],
+                           startPoint: .topLeading,
+                           endPoint: .bottomTrailing)
+                .opacity(0.85)
+        )
+        .cornerRadius(20)
+        .shadow(radius: 8)
+        .padding(.horizontal)
+    }
 }

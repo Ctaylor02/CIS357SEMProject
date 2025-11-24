@@ -24,6 +24,8 @@ class WorkoutViewModel: ObservableObject {
 
     @Published var weeklySteps: Int = 56000
     @Published var monthlySteps: Int = 224000
+    @Published var dailySteps: Int = 0
+
 
     // Timer
     @Published var elapsedTime: TimeInterval = 0
