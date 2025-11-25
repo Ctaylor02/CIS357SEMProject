@@ -44,7 +44,7 @@ struct ProfileView: View {
 
 extension ProfileView {
 
-    // MARK: PROFILE IMAGE
+    // PROFILE IMAGE
     private var profileImageSection: some View {
         VStack {
             if let img = profileManager.profileImage() {
@@ -81,7 +81,7 @@ extension ProfileView {
         }
     }
 
-    // MARK: INFO FIELDS
+    // INFO FIELDS
     private var infoFieldsSection: some View {
         VStack(spacing: 15) {
             profileField(title: "Name", value: $profileManager.profile.name)
@@ -105,7 +105,7 @@ extension ProfileView {
         .padding(.horizontal)
     }
 
-    // MARK: BIO (always white)
+    // BIO
     private var bioSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Bio")
@@ -115,13 +115,13 @@ extension ProfileView {
             TextEditor(text: $profileManager.profile.bio)
                 .frame(height: 100)
                 .padding(8)
-                .background(Color.white)        // 👍 stays white in dark mode
+                .background(Color.white)
                 .cornerRadius(12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(Color.gray.opacity(0.4), lineWidth: 1)
                 )
-                .foregroundColor(.black)        // 👍 readable text
+                .foregroundColor(.black)
         }
         .padding()
         .background(.white.opacity(0.15))
@@ -129,7 +129,7 @@ extension ProfileView {
         .padding(.horizontal)
     }
 
-    // MARK: FITNESS GOALS
+    //  FITNESS GOALS
     private var fitnessGoalsSection: some View {
         VStack(alignment: .leading, spacing: 15) {
 
@@ -165,7 +165,7 @@ extension ProfileView {
         .padding(.horizontal)
     }
 
-    // MARK: BMI CARD
+    //  BMI CARD
     private var bmiCard: some View {
         let bmi = profileManager.profile.bmi
         let category = profileManager.profile.bmiCategory
@@ -197,7 +197,7 @@ extension ProfileView {
         .padding(.horizontal)
     }
 
-    // MARK: ACHIEVEMENTS
+    // ACHIEVEMENTS
     private var achievementsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Achievements")
@@ -227,7 +227,7 @@ extension ProfileView {
         .padding(.horizontal)
     }
 
-    // MARK: FIELD BUILDER
+    //  FIELD BUILDER
     private func profileField(title: String, value: Binding<String>) -> some View {
         VStack(alignment: .leading, spacing: 5) {
             Text(title)
@@ -247,7 +247,7 @@ extension ProfileView {
         }
     }
 
-    // MARK: SAVE BUTTON
+    //  SAVE BUTTON
     private var saveButton: some View {
         VStack {
             Spacer()
@@ -273,7 +273,7 @@ extension ProfileView {
         }
     }
 
-    // MARK: SAVED BANNER
+    //  SAVED BANNER
     private var savedBanner: some View {
         VStack {
             Spacer()

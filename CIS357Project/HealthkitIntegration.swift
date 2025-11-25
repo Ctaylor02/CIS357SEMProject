@@ -104,4 +104,11 @@ class HealthkitIntegration: ObservableObject {
         }
         healthStore.execute(query)
     }
+    
+    func refreshSteps() {
+        dailyStepsUpdate()
+        weeklyStepsUpdate()
+        monthlyStepsUpdate()
+    }
+
 }

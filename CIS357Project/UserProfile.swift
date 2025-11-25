@@ -10,7 +10,7 @@ struct UserProfile: Codable {
     var fitnessLevel: FitnessLevel = .beginner
     var photoData: Data? = nil
     
-    // MARK: - New Additions
+    // New Additions
     var bio: String = ""
     
     // Goals
@@ -22,14 +22,14 @@ struct UserProfile: Codable {
     var achievements: [Achievement] = []
 }
 
-// --- Existing Enum ---
+
 enum FitnessLevel: String, Codable, CaseIterable {
     case beginner = "Beginner"
     case intermediate = "Intermediate"
     case advanced = "Advanced"
 }
 
-// MARK: - New Enums
+//  New Enums
 
 enum FitnessGoal: String, Codable, CaseIterable {
     case loseWeight = "Lose Weight"
@@ -45,7 +45,7 @@ enum Achievement: String, Codable, CaseIterable, Hashable {
     case tenThousandSteps = "🚶 10,000 Steps in a Day"
 }
 
-// MARK: - Computed Metrics
+//  Computed Metrics
 extension UserProfile {
     
     // BMI formula: lbs → kg, cm → m

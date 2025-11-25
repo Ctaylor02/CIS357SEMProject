@@ -13,6 +13,9 @@ class WorkoutViewModel: ObservableObject {
     @EnvironmentObject var healthKit: HealthkitIntegration
     @Published var workouts: [Workout]
     @Published var selectedWorkout: Workout
+    @Published var todayWorkoutTime: TimeInterval = 0
+    @Published var todayCalories: Int = 0
+
     
     // Automatically save whenever history changes
     @Published var history: [Workout] = [] {
@@ -45,7 +48,7 @@ class WorkoutViewModel: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
 
-    // MARK: - Init
+    //  Init
     init() {
         let defaultWorkouts = [
             Workout(name: "Running"),
@@ -237,16 +240,32 @@ class WorkoutViewModel: ObservableObject {
 
     // Dynamic Progress Stats
     private func updateProgressStats() {
-        //  total workout count in the past week/month
         let calendar = Calendar.current
         let now = Date()
         let oneWeekAgo = calendar.date(byAdding: .day, value: -7, to: now)!
         let oneMonthAgo = calendar.date(byAdding: .day, value: -30, to: now)!
 
-        let weeklyWorkouts = history.filter { $0.date ?? now >= oneWeekAgo }
-        let monthlyWorkouts = history.filter { $0.date ?? now >= oneMonthAgo }
+        // Weekly / Monthly Workouts
+        let weeklyWorkouts = history.filter { ($0.date ?? now) >= oneWeekAgo }
+        let monthlyWorkouts = history.filter { ($0.date ?? now) >= oneMonthAgo }
 
-        weeklySteps = weeklyWorkouts.count * 8000 //
+        weeklySteps = weeklyWorkouts.count * 8000
         monthlySteps = monthlyWorkouts.count * 8000
+
+        // Today’s workouts
+        let todaysWorkouts = history.filter { Calendar.current.isDateInToday($0.date ?? now) }
+
+        // Update daily steps based on workouts (fallback if HealthKit isn't used)
+        dailySteps = todaysWorkouts.count * 8000
+
+        // (Or if HealthKit is enabled, override it later)
+
+        //  total active workout time today
+        let totalSeconds = todaysWorkouts.reduce(0) { $0 + $1.duration }
+        todayWorkoutTime = totalSeconds
+
+        //
+        todayCalories = Int(Double(dailySteps) * 0.04)   
     }
+
 }

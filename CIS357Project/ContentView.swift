@@ -5,14 +5,16 @@ import Combine
 struct ContentView: View {
     @StateObject private var viewModel: WorkoutViewModel
     @EnvironmentObject private var navigator: MyNavigator
-    @EnvironmentObject private var profileManager: UserProfileManager  
+    @EnvironmentObject private var profileManager: UserProfileManager
+    @EnvironmentObject private var healthKit: HealthkitIntegration
+
 
     @State private var showAddWorkout = false
     @State private var newWorkoutName = ""
     @State private var showAchievementBanner = false
     @State private var showSettings = false
 
-    // MARK: - Daily Quote
+    //  Daily Quote
     private var dailyQuote: String {
         let quotes = [
             "Push yourself, because no one else will.",
@@ -236,6 +238,9 @@ struct ContentView: View {
                     ProfileView()
                 }
             }
+            .onAppear {
+                healthKit.refreshSteps()
+            }
         }
     }
 }
@@ -243,7 +248,7 @@ struct ContentView: View {
 extension ContentView {
     // Today's Stats Card
     private var todaysStatsCard: some View {
-        let steps = viewModel.dailySteps
+        let steps = healthKit.dailySteps
         let calories = Int(Double(steps) * 0.04)
 
         let todaysWorkouts = viewModel.history.filter {
