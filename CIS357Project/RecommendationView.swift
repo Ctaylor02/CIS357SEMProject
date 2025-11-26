@@ -5,94 +5,151 @@ struct RecommendationView: View {
 
     var body: some View {
         ZStack {
-            backgroundGradient
-            
             if let rec = viewModel.todayRecommendation {
-                ScrollView {
-                    VStack(spacing: 30) {
-                        
-                        titleHeader
-                        
+                background(rec.themeColor)
+
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 28) {
+
+                        header(rec)
+
                         workoutCard(rec)
                         mealCard(rec)
-                        
-                        Spacer()
+                        whySection(rec)
+
+                        Spacer().frame(height: 40)
                     }
-                    .padding()
+                    .padding(.horizontal)
                 }
             } else {
                 ProgressView("Loading recommendation...")
                     .foregroundColor(.secondary)
             }
         }
-        .navigationTitle("Daily Recommendation")
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 extension RecommendationView {
-    
-    private var backgroundGradient: some View {
-        LinearGradient(colors: [.orange.opacity(0.25), .pink.opacity(0.22)],
-                       startPoint: .topLeading,
-                       endPoint: .bottomTrailing)
-            .ignoresSafeArea()
+
+    //  Background
+    private func background(_ color: Color) -> some View {
+        LinearGradient(
+            colors: [
+                color.opacity(0.45),
+                Color.black.opacity(0.15)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
     }
-    
-    private var titleHeader: some View {
-        Text("Today's Recommendation")
-            .font(.system(size: 34, weight: .heavy, design: .rounded))
-            .foregroundStyle(
-                .linearGradient(colors: [.purple, .orange],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing)
-            )
-            .padding(.top, 10)
+
+    // Header
+    private func header(_ rec: DailyRecommendation) -> some View {
+        VStack(spacing: 8) {
+            Text("\(rec.emoji) \(rec.day)")
+                .font(.system(size: 40, weight: .bold, design: .rounded))
+
+            Text("Today's Recommendation")
+                .font(.title2.weight(.semibold))
+                .foregroundColor(.white.opacity(0.9))
+        }
+        .padding(.top, 20)
+        .frame(maxWidth: .infinity)
     }
-    
-    //  Workout Card
+
+    // Workout Card
     private func workoutCard(_ rec: DailyRecommendation) -> some View {
-        VStack(spacing: 12) {
-            Text("💪 Workout: \(rec.workout.name)")
+        VStack(alignment: .leading, spacing: 12) {
+
+            HStack(spacing: 12) {
+                Image(systemName: "figure.strengthtraining.traditional")
+                    .font(.system(size: 28))
+                    .foregroundColor(.orange)
+
+                Text("Workout")
+                    .font(.title3.bold())
+            }
+
+            Text(rec.workout.name)
                 .font(.headline)
-            
+                .foregroundColor(.primary)
+
             if let reps = rec.workout.reps {
                 Text("Sets: \(rec.workout.sets) • Reps: \(reps)")
+                    .foregroundColor(.secondary)
             }
+
             if let duration = rec.workout.durationMinutes {
                 Text("Duration: \(duration) minutes")
+                    .foregroundColor(.secondary)
             }
         }
         .padding()
-        .frame(maxWidth: .infinity)
-        .background(RoundedRectangle(cornerRadius: 20).fill(Color.white.opacity(0.20)))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.ultraThinMaterial)
+        .cornerRadius(20)
         .shadow(radius: 5)
     }
-    
+
     //  Meal Card
     private func mealCard(_ rec: DailyRecommendation) -> some View {
-        VStack(spacing: 12) {
-            Text("🥗 Meal: \(rec.meal.name)")
+        VStack(alignment: .leading, spacing: 12) {
+
+            HStack(spacing: 12) {
+                Image(systemName: "fork.knife")
+                    .font(.system(size: 28))
+                    .foregroundColor(.green)
+
+                Text("Meal")
+                    .font(.title3.bold())
+            }
+
+            Text(rec.meal.name)
                 .font(.headline)
-            
+
             Text("\(rec.meal.calories) Calories")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-            
+
             Text(rec.meal.description)
                 .font(.subheadline)
-                .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
         }
         .padding()
-        .frame(maxWidth: .infinity)
-        .background(RoundedRectangle(cornerRadius: 20).fill(Color.white.opacity(0.20)))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.ultraThinMaterial)
+        .cornerRadius(20)
+        .shadow(radius: 5)
+    }
+
+    //  Why Section
+    private func whySection(_ rec: DailyRecommendation) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+
+            HStack(spacing: 12) {
+                Image(systemName: "info.circle.fill")
+                    .font(.system(size: 24))
+                    .foregroundColor(.blue)
+
+                Text("Why This Recommendation?")
+                    .font(.title3.bold())
+            }
+
+            Text("Based on your weekly routine, today's workout and meal help maintain balance and support healthy recovery.")
+                .foregroundColor(.secondary)
+                .padding(.top, 4)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.ultraThinMaterial)
+        .cornerRadius(20)
         .shadow(radius: 5)
     }
 }
 
 #Preview {
-    NavigationStack {
-        RecommendationView()
-    }
+    NavigationStack { RecommendationView() }
 }
