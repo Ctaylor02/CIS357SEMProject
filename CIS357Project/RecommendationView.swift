@@ -1,10 +1,3 @@
-//
-//  RecommendationView.swift
-//  CIS357Project
-//
-//  Created by Caleb Taylor on 11/13/25.
-//
-
 import SwiftUI
 
 struct RecommendationView: View {
@@ -12,56 +5,89 @@ struct RecommendationView: View {
 
     var body: some View {
         ZStack {
-            LinearGradient(colors: [Color.orange.opacity(0.25), Color.pink.opacity(0.2)],
-                           startPoint: .topLeading,
-                           endPoint: .bottomTrailing)
-                .ignoresSafeArea()
-
-            if let recommendation = viewModel.todayRecommendation {
-                VStack(spacing: 30) {
-                    Text("Today's Recommendation")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.linearGradient(colors: [.purple, .orange], startPoint: .topLeading, endPoint: .bottomTrailing))
-
-                    // Workout Card
-                    VStack(spacing: 15) {
-                        Text("💪 Workout: \(recommendation.workout.name)")
-                            .font(.headline)
-                        if let reps = recommendation.workout.reps {
-                            Text("Sets: \(recommendation.workout.sets), Reps: \(reps)")
-                        }
-                        if let duration = recommendation.workout.durationMinutes {
-                            Text("Duration: \(duration) min")
-                        }
+            backgroundGradient
+            
+            if let rec = viewModel.todayRecommendation {
+                ScrollView {
+                    VStack(spacing: 30) {
+                        
+                        titleHeader
+                        
+                        workoutCard(rec)
+                        mealCard(rec)
+                        
+                        Spacer()
                     }
                     .padding()
-                    .background(RoundedRectangle(cornerRadius: 20).fill(Color.white.opacity(0.2)))
-                    .shadow(radius: 5)
-
-                    // Meal Card
-                    VStack(spacing: 15) {
-                        Text("🥗 Meal: \(recommendation.meal.name)")
-                            .font(.headline)
-                        Text("\(recommendation.meal.calories) Calories")
-                        Text(recommendation.meal.description)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding()
-                    .background(RoundedRectangle(cornerRadius: 20).fill(Color.white.opacity(0.2)))
-                    .shadow(radius: 5)
-
-                    Spacer()
                 }
-                .padding()
             } else {
-                Text("Loading recommendation...")
+                ProgressView("Loading recommendation...")
                     .foregroundColor(.secondary)
             }
         }
         .navigationTitle("Daily Recommendation")
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+extension RecommendationView {
+    
+    private var backgroundGradient: some View {
+        LinearGradient(colors: [.orange.opacity(0.25), .pink.opacity(0.22)],
+                       startPoint: .topLeading,
+                       endPoint: .bottomTrailing)
+            .ignoresSafeArea()
+    }
+    
+    private var titleHeader: some View {
+        Text("Today's Recommendation")
+            .font(.system(size: 34, weight: .heavy, design: .rounded))
+            .foregroundStyle(
+                .linearGradient(colors: [.purple, .orange],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing)
+            )
+            .padding(.top, 10)
+    }
+    
+    //  Workout Card
+    private func workoutCard(_ rec: DailyRecommendation) -> some View {
+        VStack(spacing: 12) {
+            Text("💪 Workout: \(rec.workout.name)")
+                .font(.headline)
+            
+            if let reps = rec.workout.reps {
+                Text("Sets: \(rec.workout.sets) • Reps: \(reps)")
+            }
+            if let duration = rec.workout.durationMinutes {
+                Text("Duration: \(duration) minutes")
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity)
+        .background(RoundedRectangle(cornerRadius: 20).fill(Color.white.opacity(0.20)))
+        .shadow(radius: 5)
+    }
+    
+    //  Meal Card
+    private func mealCard(_ rec: DailyRecommendation) -> some View {
+        VStack(spacing: 12) {
+            Text("🥗 Meal: \(rec.meal.name)")
+                .font(.headline)
+            
+            Text("\(rec.meal.calories) Calories")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            
+            Text(rec.meal.description)
+                .font(.subheadline)
+                .multilineTextAlignment(.center)
+                .foregroundColor(.secondary)
+        }
+        .padding()
+        .frame(maxWidth: .infinity)
+        .background(RoundedRectangle(cornerRadius: 20).fill(Color.white.opacity(0.20)))
+        .shadow(radius: 5)
     }
 }
 
