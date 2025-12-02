@@ -8,7 +8,6 @@ struct ContentView: View {
     @EnvironmentObject private var profileManager: UserProfileManager
     @EnvironmentObject private var healthKit: HealthkitIntegration
 
-
     @State private var showAddWorkout = false
     @State private var newWorkoutName = ""
     @State private var showAchievementBanner = false
@@ -38,10 +37,12 @@ struct ContentView: View {
         NavigationStack(path: $navigator.navPath) {
             ZStack {
                 // Background
-                LinearGradient(colors: [Color.blue.opacity(0.3),
-                                        Color.purple.opacity(0.2)],
-                               startPoint: .topLeading,
-                               endPoint: .bottomTrailing)
+                LinearGradient(
+                    colors: [Color.blue.opacity(0.3),
+                             Color.purple.opacity(0.2)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
                 .ignoresSafeArea()
 
                 FloatingIconsView()
@@ -51,13 +52,17 @@ struct ContentView: View {
                     todaysStatsCard
                         .padding(.top, 20)
 
-                    //  Header + Settings Button
+                    // Header + Settings
                     HStack {
                         Text("Workout Tracker")
                             .font(.system(size: 36, weight: .heavy, design: .rounded))
-                            .foregroundStyle(.linearGradient(colors: [.pink, .purple],
-                                                             startPoint: .top,
-                                                             endPoint: .bottom))
+                            .foregroundStyle(
+                                .linearGradient(
+                                    colors: [.pink, .purple],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
                             .shadow(radius: 5)
 
                         Spacer()
@@ -76,7 +81,7 @@ struct ContentView: View {
                     }
                     .padding(.horizontal)
 
-                    //  Quote
+                    // Quote
                     Text("💡 \(dailyQuote)")
                         .font(.subheadline)
                         .fontWeight(.semibold)
@@ -85,7 +90,7 @@ struct ContentView: View {
                         .padding(.horizontal)
                         .padding(.bottom, 5)
 
-                    //  Streak Info
+                    // Streak Info
                     VStack(spacing: 5) {
                         Text("🔥 Current Streak: \(viewModel.currentStreak) day(s)")
                             .font(.headline)
@@ -96,7 +101,7 @@ struct ContentView: View {
                             .foregroundColor(.yellow)
                     }
 
-                    //  Workout Picker
+                    // Workout Picker
                     Picker("Workout", selection: $viewModel.selectedWorkout) {
                         ForEach(viewModel.workouts) { workout in
                             Text(workout.name).tag(workout)
@@ -108,8 +113,9 @@ struct ContentView: View {
                     .cornerRadius(12)
                     .shadow(radius: 3)
 
-                    //  Buttons
+                    // Buttons
                     VStack(spacing: 12) {
+
                         Button("Start") {
                             viewModel.startWorkout()
                             navigator.navigate(to: .workout(viewModel.selectedWorkout))
@@ -131,14 +137,14 @@ struct ContentView: View {
                         .buttonStyle(.borderedProminent)
                         .tint(.yellow)
                         .frame(maxWidth: .infinity)
-                        
+                       
                         Button("Calorie Count") {
                             navigator.navigate(to: .calorieCount)
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(.cyan)
                         .frame(maxWidth: .infinity)
-                        
+
                         Button("Daily Recommendation") {
                             navigator.navigate(to: .recommendation)
                         }
@@ -146,6 +152,7 @@ struct ContentView: View {
                         .tint(.orange)
                         .frame(maxWidth: .infinity)
 
+                        // ADD CUSTOM WORKOUT → new sheet
                         Button("Add Custom Workout") {
                             showAddWorkout.toggle()
                         }
@@ -187,34 +194,13 @@ struct ContentView: View {
                 }
             }
 
-            // Add Workout Sheet
+            // NEW AddWorkoutSheet
             .sheet(isPresented: $showAddWorkout) {
-                VStack(spacing: 20) {
-                    Text("Add New Workout")
-                        .font(.title2).bold()
-
-                    TextField("Workout Name", text: $newWorkoutName)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding(.horizontal)
-
-                    Button("Save") {
-                        guard !newWorkoutName.isEmpty else { return }
-                        let workout = Workout(name: newWorkoutName)
-                        viewModel.workouts.append(workout)
-                        viewModel.selectedWorkout = workout
-                        newWorkoutName = ""
-                        showAddWorkout = false
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.green)
-
-                    Button("Cancel") {
-                        newWorkoutName = ""
-                        showAddWorkout = false
-                    }
-                    .buttonStyle(.bordered)
-                }
-                .padding()
+                AddWorkoutSheet(
+                    viewModel: viewModel,
+                    newWorkoutName: $newWorkoutName,
+                    showAddWorkout: $showAddWorkout
+                )
             }
 
             // Settings Sheet
@@ -242,7 +228,7 @@ struct ContentView: View {
 
                 case .profile:
                     ProfileView()
-                    
+                   
                 case .calorieCount:
                     CalorieCountView(viewModel: viewModel)
                 }
@@ -260,7 +246,9 @@ extension ContentView {
     private var todaysStatsCard: some View {
         let steps = healthKit.dailySteps
         let healthKitCalories = healthKit.dailyCalories
-        let calories = healthKitCalories > 0 ? healthKitCalories : Int(Double(steps) * 0.04)
+        let calories = healthKitCalories > 0
+            ? healthKitCalories
+            : Int(Double(steps) * 0.04)
 
         let todaysWorkouts = viewModel.history.filter {
             Calendar.current.isDateInToday($0.date ?? Date())
@@ -288,10 +276,12 @@ extension ContentView {
         .padding()
         .frame(maxWidth: .infinity)
         .background(
-            LinearGradient(colors: [.purple, .pink],
-                           startPoint: .topLeading,
-                           endPoint: .bottomTrailing)
-                .opacity(0.85)
+            LinearGradient(
+                colors: [.purple, .pink],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .opacity(0.85)
         )
         .cornerRadius(20)
         .shadow(radius: 8)
