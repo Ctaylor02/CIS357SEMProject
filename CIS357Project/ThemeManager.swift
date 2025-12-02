@@ -15,7 +15,12 @@ class ThemeManager: ObservableObject {
         }
     }
 
+    // Primary accent color used throughout the app
+    @Published var accentColor: Color
+
     init() {
         self.isDarkMode = UserDefaults.standard.bool(forKey: "isDarkModePreference")
+        // Choose a default accent color; can be made dynamic later if desired
+        self.accentColor = .purple
     }
 }
