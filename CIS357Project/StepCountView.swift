@@ -14,9 +14,9 @@ enum StepPeriod: CaseIterable {
     
     var subtitle: String {
         switch self {
-        case .daily: return "Steps Today"
-        case .weekly: return "Steps This Week"
-        case .monthly: return "Steps This Month"
+        case .daily: return "Today"
+        case .weekly: return "Last 7 Days"
+        case .monthly: return "Last 30 Days"
         }
     }
 }
@@ -55,7 +55,7 @@ struct StepCountView: View {
 
 extension StepCountView {
     
-    // MARK: - Computed Step Value
+
     private var stepValue: Int {
         switch selectedPeriod {
         case .daily: return healthKit.dailySteps
@@ -64,7 +64,7 @@ extension StepCountView {
         }
     }
     
-    // MARK: - Background
+
     var backgroundGradient: some View {
         LinearGradient(
             colors: [Color.blue.opacity(0.25), Color.purple.opacity(0.20)],
@@ -74,7 +74,6 @@ extension StepCountView {
         .ignoresSafeArea()
     }
     
-    // MARK: - Header
     private var header: some View {
         Text("Step Count")
             .font(.system(size: 36, weight: .heavy, design: .rounded))
@@ -84,7 +83,6 @@ extension StepCountView {
             .shadow(radius: 5)
     }
     
-    // MARK: - Segmented Picker
     private var periodPicker: some View {
         HStack(spacing: 0) {
             ForEach(StepPeriod.allCases, id: \.self) { period in
@@ -111,7 +109,6 @@ extension StepCountView {
         .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.15)))
     }
     
-    // MARK: - Progress Ring + Step Number
     private var progressSection: some View {
         VStack(spacing: 20) {
             ZStack {
@@ -141,7 +138,6 @@ extension StepCountView {
         }
     }
     
-    // MARK: - Step Info Card
     private var stepInfoCard: some View {
         VStack(spacing: 10) {
             Text("You're doing great!")

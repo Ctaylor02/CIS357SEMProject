@@ -121,18 +121,17 @@ struct ContentView: View {
                         Button("History") {
                             navigator.navigate(to: .History)
                         }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(.borderedProminent)
                         .tint(.blue)
                         .frame(maxWidth: .infinity)
 
-                        Button {
+                        Button("Step Count") {
                             navigator.navigate(to: .stepCount)
-                        } label: {
-                            Text("Step Count")
-                                .frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.bordered)
-
+                        .buttonStyle(.borderedProminent)
+                        .tint(.yellow)
+                        .frame(maxWidth: .infinity)
+                        
                         Button("Daily Recommendation") {
                             navigator.navigate(to: .recommendation)
                         }

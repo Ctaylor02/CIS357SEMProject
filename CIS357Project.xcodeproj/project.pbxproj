@@ -417,7 +417,7 @@
 				CODE_SIGN_ENTITLEMENTS = CIS357Project/CIS357Project.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = M366C796DB;
+				DEVELOPMENT_TEAM = 9358SQ7JA6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app wants to read your health data";
@@ -433,7 +433,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.samuptigrove.CIS357Project2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.samueluptigrove.CIS357Project2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -453,7 +453,7 @@
 				CODE_SIGN_ENTITLEMENTS = CIS357Project/CIS357Project.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = M366C796DB;
+				DEVELOPMENT_TEAM = 9358SQ7JA6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app wants to read your health data";
@@ -469,7 +469,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.samuptigrove.CIS357Project2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.samueluptigrove.CIS357Project2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
