@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// allows for coustom workouts
 struct AddWorkoutSheet: View {
     @ObservedObject var viewModel: WorkoutViewModel
     @Binding var newWorkoutName: String
