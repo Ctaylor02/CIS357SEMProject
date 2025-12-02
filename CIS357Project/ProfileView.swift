@@ -110,24 +110,25 @@ extension ProfileView {
         VStack(alignment: .leading, spacing: 10) {
             Text("Bio")
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(Color(.label))
 
             TextEditor(text: $profileManager.profile.bio)
                 .frame(height: 100)
                 .padding(8)
-                .background(Color.white)
+                .background(Color(.secondarySystemBackground))
                 .cornerRadius(12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                        .stroke(Color(.separator), lineWidth: 1)
                 )
-                .foregroundColor(.black)
+                .foregroundColor(Color(.label))
         }
         .padding()
-        .background(.white.opacity(0.15))
+        .background(Color(.tertiarySystemBackground).opacity(0.5))
         .cornerRadius(20)
         .padding(.horizontal)
     }
+
 
     //  FITNESS GOALS
     private var fitnessGoalsSection: some View {
