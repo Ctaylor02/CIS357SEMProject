@@ -137,7 +137,7 @@ struct Haptics {
     }
 }
 
-#Preview {
-    TrackWorkoutView(viewModel: WorkoutViewModel(), workout: Workout(name: "Running", duration: 1800))
-        .environmentObject(MyNavigator())
-}
+//#Preview {
+//    TrackWorkoutView(viewModel: WorkoutViewModel(), workout: Workout(name: "Running", duration: 1800))
+//        .environmentObject(MyNavigator())
+//}

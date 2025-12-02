@@ -28,13 +28,18 @@ extension Date {
 
 class HealthkitIntegration: ObservableObject {
     let healthStore = HKHealthStore()
-    @Published var dailySteps: Int = 0  
+    @Published var dailySteps: Int = 0
     @Published var weeklySteps: Int = 0
     @Published var monthlySteps: Int = 0
     
+    @Published var dailyCalories: Int = 0
+    @Published var weeklyCalories: Int = 0
+    @Published var monthlyCalories: Int = 0
+    
     init() {
         let steps = HKQuantityType(.stepCount)
-        let activityArr: Set = [steps]
+        let calories = HKQuantityType(.activeEnergyBurned)
+        let activityArr: Set = [steps, calories]
         
         Task {
             do {
@@ -43,6 +48,11 @@ class HealthkitIntegration: ObservableObject {
                 dailyStepsUpdate()
                 weeklyStepsUpdate()
                 monthlyStepsUpdate()
+                
+                dailyCaloriesUpdate()
+                weeklyCaloriesUpdate()
+                monthlyCaloriesUpdate()
+
             } catch {
                 print("Error grabbing data: \(error.localizedDescription)")
             }
@@ -52,10 +62,14 @@ class HealthkitIntegration: ObservableObject {
             self.dailyStepsUpdate()
             self.weeklyStepsUpdate()
             self.monthlyStepsUpdate()
-
+            
+            self.dailyCaloriesUpdate()
+            self.weeklyCaloriesUpdate()
+            self.monthlyCaloriesUpdate()
+            
             
         }
-
+        
     }
     func dailyStepsUpdate() {
         let steps = HKQuantityType(.stepCount)
@@ -66,11 +80,11 @@ class HealthkitIntegration: ObservableObject {
                 return
             }
             let stepCount = Int(quantity.doubleValue(for: .count()))
-//        let activity = Activities(id: 0, title: "Today's Steps", subtitles: "Goal 10,000", image: "figure.walk", amount: String(Int(stepCount)))
+            //        let activity = Activities(id: 0, title: "Today's Steps", subtitles: "Goal 10,000", image: "figure.walk", amount: String(Int(stepCount)))
             DispatchQueue.main.async {
                 self.dailySteps = stepCount
             }
-//        print(stepCount)
+            //        print(stepCount)
         }
         healthStore.execute(query)
     }
@@ -110,5 +124,55 @@ class HealthkitIntegration: ObservableObject {
         weeklyStepsUpdate()
         monthlyStepsUpdate()
     }
-
+    
+    func refreshCalories() {
+        dailyCaloriesUpdate()
+        weeklyCaloriesUpdate()
+        monthlyCaloriesUpdate()
+    }
+    
+    func dailyCaloriesUpdate() {
+        let caloriestype = HKQuantityType(.activeEnergyBurned)
+        let theDate = HKQuery.predicateForSamples(withStart: .startOfDay, end: Date())
+        let query = HKStatisticsQuery(quantityType: caloriestype, quantitySamplePredicate: theDate, options: .cumulativeSum) {_, result, error in guard let quantity = result?.sumQuantity(), error == nil else{
+            print("error grabbing data")
+            return
+            }
+            let calories = Int(quantity.doubleValue(for: .kilocalorie()))
+            DispatchQueue.main.async {
+                self.dailyCalories = calories
+            }
+        }
+        healthStore.execute(query)
+    }
+    
+    func weeklyCaloriesUpdate() {
+        let caloriestype = HKQuantityType(.activeEnergyBurned)
+        let theDate = HKQuery.predicateForSamples(withStart: .startOfWeek, end: Date())
+        let query = HKStatisticsQuery(quantityType: caloriestype, quantitySamplePredicate: theDate, options: .cumulativeSum) {_, result, error in guard let quantity = result?.sumQuantity(), error == nil else{
+            print("error grabbing data")
+            return
+            }
+            let calories = Int(quantity.doubleValue(for: .kilocalorie()))
+            DispatchQueue.main.async {
+                self.weeklyCalories = calories
+            }
+        }
+        healthStore.execute(query)
+    }
+    
+    func monthlyCaloriesUpdate() {
+        let caloriestype = HKQuantityType(.activeEnergyBurned)
+        let theDate = HKQuery.predicateForSamples(withStart: .startOfMonth, end: Date())
+        let query = HKStatisticsQuery(quantityType: caloriestype, quantitySamplePredicate: theDate, ) {_, result, error in guard let quantity = result?.sumQuantity(), error == nil else{
+            print("error grabbing data")
+            return
+            }
+            let calories = Int(quantity.doubleValue(for: .kilocalorie()))
+            DispatchQueue.main.async {
+                self.monthlyCalories = calories
+            }
+        }
+        healthStore.execute(query)
+    }
 }

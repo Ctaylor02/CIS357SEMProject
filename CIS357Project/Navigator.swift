@@ -14,6 +14,7 @@ enum Route: Hashable {
     case stepCount
     case recommendation
     case profile
+    case calorieCount
 
 }
 

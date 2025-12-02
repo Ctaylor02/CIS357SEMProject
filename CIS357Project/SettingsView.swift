@@ -131,7 +131,7 @@ struct SettingsView: View {
     }
 }
 
-#Preview {
-    SettingsView(viewModel: WorkoutViewModel())
-        .environmentObject(ThemeManager())
-}
+//#Preview {
+//    SettingsView(viewModel: WorkoutViewModel())
+//        .environmentObject(ThemeManager())
+//}

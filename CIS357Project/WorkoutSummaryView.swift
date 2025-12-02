@@ -145,8 +145,8 @@ struct WorkoutSummaryView: View {
     }
 }
 
-#Preview {
-    WorkoutSummaryView(viewModel: WorkoutViewModel(),
-                       workout: Workout(name: "Running", date: Date(), duration: 1800))
-        .environmentObject(MyNavigator())
-}
+//#Preview {
+//    WorkoutSummaryView(viewModel: WorkoutViewModel(),
+//                       workout: Workout(name: "Running", date: Date(), duration: 1800))
+//        .environmentObject(MyNavigator())
+//}

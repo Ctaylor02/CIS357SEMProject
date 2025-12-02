@@ -132,6 +132,13 @@ struct ContentView: View {
                         .tint(.yellow)
                         .frame(maxWidth: .infinity)
                         
+                        Button("Calorie Count") {
+                            navigator.navigate(to: .calorieCount)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.cyan)
+                        .frame(maxWidth: .infinity)
+                        
                         Button("Daily Recommendation") {
                             navigator.navigate(to: .recommendation)
                         }
@@ -235,10 +242,14 @@ struct ContentView: View {
 
                 case .profile:
                     ProfileView()
+                    
+                case .calorieCount:
+                    CalorieCountView(viewModel: viewModel)
                 }
             }
             .onAppear {
                 healthKit.refreshSteps()
+                healthKit.refreshCalories()
             }
         }
     }
@@ -248,7 +259,8 @@ extension ContentView {
     // Today's Stats Card
     private var todaysStatsCard: some View {
         let steps = healthKit.dailySteps
-        let calories = Int(Double(steps) * 0.04)
+        let healthKitCalories = healthKit.dailyCalories
+        let calories = healthKitCalories > 0 ? healthKitCalories : Int(Double(steps) * 0.04)
 
         let todaysWorkouts = viewModel.history.filter {
             Calendar.current.isDateInToday($0.date ?? Date())

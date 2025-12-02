@@ -9,11 +9,16 @@ import SwiftUI
 
 @main
 struct CIS357ProjectApp: App {
-    @StateObject private var viewModel = WorkoutViewModel()
+    @StateObject private var healthKit: HealthkitIntegration
+    @StateObject private var viewModel: WorkoutViewModel
     @StateObject private var navigator = MyNavigator()
-    @StateObject private var healthKit = HealthkitIntegration()
     @StateObject private var profileManager = UserProfileManager()
-
+    
+    init() {
+        let healthKitCall = HealthkitIntegration()
+        _healthKit = StateObject(wrappedValue: healthKitCall)
+        _viewModel = StateObject(wrappedValue: WorkoutViewModel(healthKit: healthKitCall))
+    }
 
     //Global Theme Manager
     @StateObject private var theme = ThemeManager()

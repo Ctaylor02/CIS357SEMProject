@@ -10,11 +10,13 @@ import Combine
 import SwiftUI
 
 class WorkoutViewModel: ObservableObject {
-    @EnvironmentObject var healthKit: HealthkitIntegration
+    let healthKit: HealthkitIntegration
     @Published var workouts: [Workout]
     @Published var selectedWorkout: Workout
     @Published var todayWorkoutTime: TimeInterval = 0
     @Published var todayCalories: Int = 0
+    @Published var weeklyCalories: Int = 0
+    @Published var monthlyCalories: Int = 0
 
     
     // Automatically save whenever history changes
@@ -25,8 +27,8 @@ class WorkoutViewModel: ObservableObject {
         }
     }
 
-    @Published var weeklySteps: Int = 56000
-    @Published var monthlySteps: Int = 224000
+    @Published var weeklySteps: Int = 0
+    @Published var monthlySteps: Int = 0
     @Published var dailySteps: Int = 0
 
 
@@ -49,7 +51,8 @@ class WorkoutViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
     //  Init
-    init() {
+    init(healthKit: HealthkitIntegration) {
+        self.healthKit = healthKit
         let defaultWorkouts = [
             Workout(name: "Running"),
             Workout(name: "Cycling"),
@@ -249,23 +252,29 @@ class WorkoutViewModel: ObservableObject {
         let weeklyWorkouts = history.filter { ($0.date ?? now) >= oneWeekAgo }
         let monthlyWorkouts = history.filter { ($0.date ?? now) >= oneMonthAgo }
 
-        weeklySteps = weeklyWorkouts.count * 8000
-        monthlySteps = monthlyWorkouts.count * 8000
+        weeklySteps = healthKit.weeklySteps
+        monthlySteps = healthKit.monthlySteps
 
         // Today’s workouts
         let todaysWorkouts = history.filter { Calendar.current.isDateInToday($0.date ?? now) }
 
-        // Update daily steps based on workouts (fallback if HealthKit isn't used)
-        dailySteps = todaysWorkouts.count * 8000
-
-        // (Or if HealthKit is enabled, override it later)
+        dailySteps = healthKit.dailySteps
 
         //  total active workout time today
         let totalSeconds = todaysWorkouts.reduce(0) { $0 + $1.duration }
         todayWorkoutTime = totalSeconds
 
-        //
-        todayCalories = Int(Double(dailySteps) * 0.04)   
+        todayCalories = healthKit.dailyCalories
+        if todayCalories <= 0 {
+            todayCalories = Int(Double(dailySteps) * 0.04)
+        }
+        weeklyCalories = healthKit.weeklyCalories
+        if weeklyCalories <= 0 {
+            weeklyCalories = Int(Double(weeklySteps) * 0.04)
+        }
+        if monthlyCalories <= 0 {
+            monthlyCalories = Int(Double(monthlySteps) * 0.04)
+        }
     }
 
 }
