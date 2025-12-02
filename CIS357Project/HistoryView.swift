@@ -249,11 +249,17 @@ extension HistoryView {
     private func generateMonthlyHeatmap() -> [HeatmapDay] {
         let calendar = Calendar.current
         let today = Date()
+
+        // Start of month at EXACT midnight
+        let base = calendar.startOfDay(for: today)
+
         let monthRange = calendar.range(of: .day, in: .month, for: today)!
 
         return monthRange.map { day -> HeatmapDay in
-            let date = calendar.date(bySetting: .day, value: day, of: today)!
+            // Generate a date with correct time (midnight)
+            let date = calendar.date(bySetting: .day, value: day, of: base)!
 
+            // Check if user worked out
             let matched = viewModel.history.contains {
                 guard let d = $0.date else { return false }
                 return calendar.isDate(d, inSameDayAs: date)
@@ -266,6 +272,7 @@ extension HistoryView {
             )
         }
     }
+
 
     struct HeatmapDay: Identifiable {
         let id: UUID
